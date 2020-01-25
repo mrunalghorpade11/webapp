@@ -10,11 +10,11 @@ const app = express();
 const cors = require("cors");
 const path = require("path");
 const LOGGER = require(path.resolve(".") + "/src/logger/logger.js");
-const applicationPropertiesSingleton = require("../CSYE6225/src/modules/applicationPropertiesSingleton");
+const applicationPropertiesSingleton = require(path.resolve(".") + "/src/modules/applicationPropertiesSingleton");
 const appContextPath = applicationPropertiesSingleton.contextPath;
-const basicrouter = require("../CSYE6225/src/router/basicRoutes");
+const basicrouter = require(path.resolve(".") + "/src/router/basicRoutes.js");
 const port = 8080;
-const database = require("../CSYE6225/src/models/user");
+const database = require(path.resolve(".") + "/src/models/user");
 app.use(bodyParser.json());
 app.use(cors());
 //Routes
