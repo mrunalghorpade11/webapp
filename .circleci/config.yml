@@ -8,6 +8,13 @@ jobs:
     docker:
       # specify the version you desire here
       - image: circleci/node:10
+      - image: circleci/mariadb:10.2
+        environment:
+          MYSQL_TCP_PORT: 3306
+          MYSQL_ROOT_PASSWORD:
+          MYSQL_DATABASE: CSYE6225
+          MYSQL_USER: A
+          MYSQL_PASSWORD: 1234
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
