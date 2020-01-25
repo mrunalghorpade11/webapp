@@ -1,0 +1,28 @@
+{
+  "name": "assignment",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "mocha 'test/**/*.js' --recursive"
+  },
+  "author": "Mrunal",
+  "license": "ISC",
+  "dependencies": {
+    "mysql": "^2.17.1",
+    "path": "^0.12.7",
+    "sequelize": "^5.21.3"
+  },
+  "devDependencies": {
+    "base-64": "^0.1.0",
+    "bcrypt": "^3.0.7",
+    "chai": "^4.2.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "express-validator": "^6.3.1",
+    "log4js": "^6.1.0",
+    "mariadb": "^2.1.5",
+    "mocha": "^7.0.0",
+    "password-validator": "^5.0.3"
+  }
+}
