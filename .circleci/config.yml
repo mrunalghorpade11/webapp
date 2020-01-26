@@ -34,7 +34,7 @@ jobs:
             - v1-dependencies-
 
       - run: yarn install
-      - run: node server.js
+     # - run: node server.js
 
       - save_cache:
           paths:
