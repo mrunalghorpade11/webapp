@@ -13,7 +13,7 @@ const bcrypt = require('bcrypt');
  *@function 
  * @name createUser
  * @description Function used for service of creating new user in DB
- * @param {Object} userData data received from request bosy
+ * @param {Object} userData data received from request body
  * @param {Object} callback  
  */
 function createUser(userData, callback) {

@@ -121,8 +121,42 @@ async function editUser(data, payload, callback) {
         return callback("user account not found",null)
     })
 }
+
+function getUserID(data, callback)
+{
+    const dataSplit = data.split(':')
+    const userID = dataSplit[0];
+    const password = dataSplit[1];
+    userModel.findOne({ where: { email_address: userID }, attributes: ['password'] }).then(
+         async function(pass)
+    {
+        await bcrypt.compare(password, pass.password).then(async function (res) {
+            if(res)
+            {
+                LOGGER.info("Password matches for the given user "+File_Name);
+               userModel.findOne({where: {email_address: userID},attributes:['id']}).then(
+                   function(id)
+                   {
+                       LOGGER.info("ID found for the provided user "+File_Name)
+                       return callback(null,id);
+                   }
+               )
+            }
+            else {
+                //if password compare failed
+                LOGGER.error("Password does not match in finduserid user ", File_Name)
+                return callback("password authentication failed", null);
+            }
+        })
+    }).catch(function(error)
+    {
+        LOGGER.error("User account not found for the given POST request ",File_Name)
+        return callback("user account not found",null)
+    });
+}
 module.exports = {
     createUsers: createUsers,
     getUser,
-    editUser
+    editUser,
+    getUserID
 }

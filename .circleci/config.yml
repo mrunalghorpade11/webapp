@@ -36,6 +36,7 @@ jobs:
       - run: yarn install
       #- run: node server.js
 
+
       - save_cache:
           paths:
             - node_modules
@@ -90,10 +91,8 @@ workflows:
   build_deploy:
     jobs:
       - build:
-          filters:
-            branches:
-              only:
-                - master
-        
-
+        filters:
+          branches:
+            only:
+              - master
 
