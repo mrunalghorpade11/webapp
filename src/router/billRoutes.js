@@ -26,7 +26,7 @@ router.post("/bill", [
     check('vendor').exists().isString(),
     check('bill_date').exists().isString(),
     check('due_date').exists().isString(),
-    check('amount_due').exists().isNumeric(),
+    check('amount_due').exists().isFloat({ gt: 0.00 }),
     check('categories').exists(),
     check('paymentStatus').exists().isIn(['paid', 'due', 'past_due', 'no_payment_required'])
 ], function (req, res) {
@@ -106,6 +106,7 @@ router.get("/bills", function (req, res) {
 })
 
 router.get("/bill/:id", function (req, res) {
+    //create responce object
     const responseObj = {}
     let decodedData = {};
     const bearerHeader = req.headers.authorization;
