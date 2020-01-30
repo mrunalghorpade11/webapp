@@ -78,6 +78,7 @@ router.post("/user", [
  */
 router.get("/user/self", function (req, res) {
   LOGGER.info("Entering get user info routes " + FILE_NAME);
+  //create responce object
   const responseObj = {}
   let decodedData = {};
   const bearerHeader = req.headers.authorization;
