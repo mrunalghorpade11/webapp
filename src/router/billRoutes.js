@@ -24,8 +24,8 @@ const billService = require("../service/billService")
  */
 router.post("/bill", [
     check('vendor').exists().isString(),
-    check('bill_date').exists().isString(),
-    check('due_date').exists().isString(),
+    check('bill_date').exists().custom(isValidDate),
+    check('due_date').exists().custom(isValidDate),
     check('amount_due').exists().isFloat({ gt: 0.00 }),
     check('categories').exists(),
     check('paymentStatus').exists().isIn(['paid', 'due', 'past_due', 'no_payment_required'])
@@ -50,6 +50,7 @@ router.post("/bill", [
     else {
         res.statusCode = CONSTANTS.ERROR_CODE.UNAUTHORIZED
         responseObj.result = "unauthorised token";
+        return res.send(responseObj);
     }
     billService.createBill(decodedData, req.body, function (error, result) {
         if (error) {
@@ -87,6 +88,8 @@ router.get("/bills", function (req, res) {
     else {
         res.statusCode = CONSTANTS.ERROR_CODE.UNAUTHORIZED
         responseObj.result = "unauthorised token";
+        return res.send(responseObj);
+        
     }
 
     billService.getAllBills(decodedData, function (error, result) {
@@ -118,6 +121,7 @@ router.get("/bill/:id", function (req, res) {
     else {
         res.statusCode = CONSTANTS.ERROR_CODE.UNAUTHORIZED
         responseObj.result = "unauthorised token";
+        return res.send(responseObj);
     }
 
     billService.getbillbyID(decodedData, req.params, function (error, result) {
@@ -162,7 +166,7 @@ router.delete("/bill/:id", function (req, res) {
     else {
         res.statusCode = CONSTANTS.ERROR_CODE.UNAUTHORIZED
         responseObj.result = "unauthorised token";
-        res.send(responseObj);
+        return  res.send(responseObj);
     }
     billService.deletebillbyID(decodedData, req.params, function (error, result) {
         if (error) {
@@ -196,8 +200,8 @@ router.delete("/bill/:id", function (req, res) {
 })
 router.put("/bill/:id",[
     check('vendor').exists().isString(),
-    check('bill_date').exists(),
-    check('due_date').exists(),
+    check('bill_date').exists().custom(isValidDate),
+    check('due_date').exists().custom(isValidDate),
     check('amount_due').exists(),
     check('categories').exists().isArray(),
     check('paymentStatus').exists().isIn(['paid', 'due', 'past_due', 'no_payment_required'])
@@ -222,7 +226,7 @@ router.put("/bill/:id",[
     else {
         res.statusCode = CONSTANTS.ERROR_CODE.UNAUTHORIZED
         responseObj.result = "unauthorised token";
-        res.send(responseObj);
+        return res.send(responseObj);
     }
     billService.updatebyid(decodedData, req.params.id, req.body, function (error, result) {
         if (error) {
@@ -253,4 +257,12 @@ router.put("/bill/:id",[
         }
     })
 })
+//Date should always be YYYY-MM-DD
+function isValidDate(value) {
+    if (!value.match(/^\d{4}-\d{2}-\d{2}$/)) return false;
+  
+    const date = new Date(value);
+    if (!date.getTime()) return false;
+    return date.toISOString().slice(0, 10) === value;
+  }
 module.exports = router;
