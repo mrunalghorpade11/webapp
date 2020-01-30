@@ -8,7 +8,7 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Bill gereration prg",
+            "name": "Bill gereration",
             "skipFiles": [
                 "<node_internals>/**"
             ],
