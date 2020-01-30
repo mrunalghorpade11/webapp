@@ -53,7 +53,7 @@ async function getUser(dataObj, callback) {
 
             await bcrypt.compare(password, pass.password).then(async function (res) {
                 if (res == true) {
-                    let result = await userModel.findOne({ where: { email_address: userID, password: pass.password }, attributes: ['first_name', 'last_name', 'email_address','createdAt','updatedAt'] })
+                    let result = await userModel.findOne({ where: { email_address: userID, password: pass.password }, attributes: ['first_name', 'last_name', 'email_address', 'createdAt', 'updatedAt'] })
                     result.dataValues.account_created = result.dataValues.createdAt;
                     result.dataValues.account_updated = result.dataValues.updatedAt;
                     delete result.dataValues.createdAt;
@@ -66,10 +66,9 @@ async function getUser(dataObj, callback) {
                 }
             })
         }
-    ).catch(function(error)
-    {
-        LOGGER.error("User account not found for the given GET request ",File_Name)
-        return callback("user account not found",null)
+    ).catch(function (error) {
+        LOGGER.error("User account not found for the given GET request ", File_Name)
+        return callback("user account not found", null)
     })
     return null;
 }
@@ -93,9 +92,9 @@ async function editUser(data, payload, callback) {
             //if password compare success 
             if (res == true) {
                 LOGGER.debug("Password match success in edit user" + File_Name);
-                userModel.update(payload, { where: { email_address: userID, password: pass.password }, attributes: {exclude: ['email_address','createdAt','updatedAt']}})
-                    .then(function(user){
-                        userModel.findOne({ where: { email_address:userID} }).then(function (user) {
+                userModel.update(payload, { where: { email_address: userID, password: pass.password }, attributes: { exclude: ['email_address', 'createdAt', 'updatedAt'] } })
+                    .then(function (user) {
+                        userModel.findOne({ where: { email_address: userID } }).then(function (user) {
                             LOGGER.debug("user found after update: ", File_Name)
                             return callback(null, "user updated")
                         }).catch(function (error) {
@@ -103,7 +102,7 @@ async function editUser(data, payload, callback) {
                             return callback(error, null);
                         })
                     }
-                        
+
                     ).catch(function (error) {
                         LOGGER.error("Error in updating user ", File_Name)
                         return callback(error, null)
@@ -115,14 +114,48 @@ async function editUser(data, payload, callback) {
                 return callback("password authentication failed", null);
             }
         });
-    }).catch(function(error)
-    {
-        LOGGER.error("User account not found for the given PUT request ",File_Name)
-        return callback("user account not found",null)
+    }).catch(function (error) {
+        LOGGER.error("User account not found for the given PUT request ", File_Name)
+        return callback("user account not found", null)
     })
+}
+function getUserID(data, callback) {
+    const dataSplit = data.split(':')
+    const userID = dataSplit[0];
+    const password = dataSplit[1];
+    userModel.findOne({ where: { email_address: userID }, attributes: ['password'] }).then(
+        async function (pass) {
+            if (pass) {
+                await bcrypt.compare(password, pass.password).then(async function (res) {
+                    if (res) {
+                        LOGGER.info("Password matches for the given user " + File_Name);
+                        userModel.findOne({ where: { email_address: userID }, attributes: ['id'] }).then(
+                            function (id) {
+                                LOGGER.info("ID found for the provided user " + File_Name)
+                                return callback(null, id);
+                            }
+                        )
+                    }
+                    else {
+                        //if password compare failed
+                        LOGGER.error("Password does not match in finduserid user ", File_Name)
+                        return callback("password authentication failed", null);
+                    }
+                })
+            }
+            else {
+                LOGGER.error("user not found " + File_Name)
+                return callback("user not found", null)
+            }
+
+        }).catch(function (error) {
+            LOGGER.error("User account not found for the given POST request ", File_Name)
+            return callback("user account not found", null)
+        });
 }
 module.exports = {
     createUsers: createUsers,
     getUser,
-    editUser
+    editUser,
+    getUserID
 }

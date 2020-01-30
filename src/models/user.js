@@ -27,9 +27,12 @@ var User = sequelize.define('users', {
     },
     email_address: {
         allowNull: false,
-        // unique:true,
         type: Sequelize.STRING
     }
+},
+{
+    updatedAt: 'account_updated',
+    createdAt: 'account_created'
 });
 sequelize.sync();
 module.exports = {
