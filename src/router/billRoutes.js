@@ -106,6 +106,7 @@ router.get("/bills", function (req, res) {
 })
 
 router.get("/bill/:id", function (req, res) {
+    //create responce object
     const responseObj = {}
     let decodedData = {};
     const bearerHeader = req.headers.authorization;
