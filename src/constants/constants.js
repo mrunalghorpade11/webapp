@@ -16,8 +16,16 @@ const ERROR_CODE = {
     BAD_REQUEST: 400,
     CREATED: 201,
     NO_CONTENT: 204
-  };
+  }
+
+  const ERROR_DESCRIPTION = {
+      NOT_FOUND : "data not found",
+      UNAUTHORIZED: "user unauthorized to access this data",
+      SUCCESS : "operation successfull "
+
+  }
 
   module.exports = {
-      ERROR_CODE
+      ERROR_CODE,
+      ERROR_DESCRIPTION
   }
