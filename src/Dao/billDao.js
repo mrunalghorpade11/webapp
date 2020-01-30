@@ -9,6 +9,7 @@ const billModel = require("../models/billModel").Bill;
 const userDao = require("../Dao/userDao")
 const LOGGER = require("../logger/logger");
 const File_Name = "billDao.js"
+const CONSTANTS = require("../constants/constants")
 /**
  *@function 
  * @name createBill
@@ -16,7 +17,7 @@ const File_Name = "billDao.js"
  * @param {Object} userData user data received from the request body
  * @param {Object} callback  
  */
-function createBill(billData, callback) {
+function create(billData, callback) {
     LOGGER.debug("Entering create bill " + File_Name);
     billModel.create(billData).then(function (bill) {
         LOGGER.info("new Bill created " + File_Name)
@@ -35,17 +36,17 @@ function createBill(billData, callback) {
  */
 function findAllbills(data, callback) {
     LOGGER.debug("Entering find all")
-    const dataSplit = data.split(':')
-    const userID = dataSplit[0];
-    const password = dataSplit[1];
     userDao.getUserID(data, function (error, result) {
         if (error) {
             LOGGER.error("error in getting user ID " + File_Name)
             return callback(error, null)
         }
         else {
-            billModel.findAll({where :{owner_id: result.dataValues.id }}).then(function (allBills) {
+            billModel.findAll({ where: { owner_id: result.dataValues.id } }).then(function (allBills) {
                 LOGGER.info("All bills found " + File_Name)
+                if (allBills == null) {
+                    return callback(null, CONSTANTS.ERROR_DESCRIPTION.NOT_FOUND)
+                }
                 return callback(null, allBills)
             }).catch(function (error) {
                 LOGGER.error("Error in find all " + File_Name)
@@ -54,89 +55,52 @@ function findAllbills(data, callback) {
         }
     })
 }
-
-function getByID(data,billID,callback)
-{
-    LOGGER.debug("Entering find all")
-    const dataSplit = data.split(':')
-    const userID = dataSplit[0];
-    const password = dataSplit[1];
-
-    userDao.getUserID(data, function (error, result) {
-        if(error)
-        {
-            LOGGER.error("error in getting user ID in getByID " + File_Name)
-            return callback(error, null)
-        }
-        else{
-            billModel.update({where:{owner_id : result.dataValues.id, id:billID}}).then(function(resultData)
-            {
-                LOGGER.info("get by id complete "+File_Name)
-                return callback(null,resultData)
-            }).catch(function (error) {
-                    LOGGER.error("Error in get by ID " + File_Name)
-                    return callback("error in get by id " + error, null)
-                })
-        }
-    })
+function findOne(billID, callback) {
+    billModel.findOne({ where: { id: billID } }).then(function (resultOfbillID) {
+        LOGGER.debug("bill ID found " + File_Name)
+        return callback(null, resultOfbillID)
+    }).catch(function (error) {
+        LOGGER.error("Error in finding Bill ID " + File_Name)
+        return callback(error, null)
+    });
 
 }
 
-function deleteByID(data,billID,callback)
-{
-    LOGGER.debug("Entering delete by id "+File_Name)
-    const dataSplit = data.split(':')
-    const userID = dataSplit[0];
-    const password = dataSplit[1];
-    userDao.getUserID(data, function (error, result) {
-        if(error)
-        {
-            LOGGER.error("error in getting user ID in getByID " + File_Name)
-            return callback(error, null)
-        }
-        else{
-            billModel.destroy({where:{owner_id : result.dataValues.id, id:billID}}).then(function(resultData)
-            {
-                LOGGER.info("get by id complete "+File_Name)
-                return callback(null,resultData)
-            }).catch(function (error) {
-                    LOGGER.error("Error in delete by ID " + File_Name)
-                    return callback("error in delte by id " + error, null)
-                })
-        }
-
+function destroy(billID, callback) {
+    billModel.destroy({ where: { id: billID } }).then(function (resultFromDestroy) {
+        LOGGER.debug("Bill deleted by detroy function " + File_Name)
+        return callback(null, resultFromDestroy);
+    }).catch(function (error) {
+        LOGGER.error("error in deleting bill");
+        return callback(error, null);
     })
+
 }
-
-function updateByID(data,billID, payload,callback)
-{
-    LOGGER.debug("Entering delete by id "+File_Name)
-    const dataSplit = data.split(':')
-    const userID = dataSplit[0];
-    const password = dataSplit[1];
-    userDao.getUserID(data, function (error, result) {
-        if(error)
+function update(billID, payload, callback) {
+    billModel.update(payload, { where: { id: billID } }).then(function (result) {
+        LOGGER.debug("Bill updated successfully " + File_Name)
+        findOne(billID, function(error,result)
         {
-            LOGGER.error("error in getting user ID in getByID " + File_Name)
-            return callback(error, null)
-        }
-        else{
-            billModel.update(payload,{where:{owner_id : result.dataValues.id, id:billID}}).then(function(resultData)
+            if(error)
             {
-                LOGGER.info("update by id complete "+File_Name)
-                return callback(null,resultData)
-            }).catch(function (error) {
-                    LOGGER.error("Error in update by ID " + File_Name)
-                    return callback("error in update by id " + error, null)
-                })
-        }
+                LOGGER.error("bill not found "+File_Name)
+                return callback(error,null)
+            }
+            else
+            {
+                LOGGER.debug("Returning responce "+File_Name)
+                return callback(null,result)
+            }
+        })
+    }).catch(function (error) {
+        LOGGER.error("Error in update " + File_Name)
+        return callback(error, null);
     })
-
 }
 module.exports = {
-    createBill,
+    create,
     findAllbills,
-    getByID,
-    deleteByID,
-    updateByID
+    findOne,
+    destroy,
+    update
 }

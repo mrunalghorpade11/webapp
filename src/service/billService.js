@@ -10,6 +10,7 @@ const File_Name = 'billService.js';
 const userDao = require("../Dao/userDao");
 const billDao = require("../Dao/billDao");
 const uuidv4 = require('uuid/v4');
+const CONSTANTS = require('../constants/constants')
 /**
  *@function 
  * @name createBill
@@ -17,7 +18,7 @@ const uuidv4 = require('uuid/v4');
  * @param {Object} userData data received from request body
  * @param {Object} callback  
  */
-function createUserService(decodeData, billData, callback) {
+function createBill(decodeData, billData, callback) {
 
     LOGGER.debug("entering create user service " + File_Name);
     userDao.getUserID(decodeData.data, function (error, resultforID) {
@@ -29,7 +30,7 @@ function createUserService(decodeData, billData, callback) {
             LOGGER.info("user Id found " + File_Name)
             billData.id = uuidv4()
             billData.owner_id = resultforID.dataValues.id
-            billDao.createBill(billData, function (error, result) {
+            billDao.create(billData, function (error, result) {
                 if (error) {
                     LOGGER.error("error in creating new bill " + File_Name)
                     return callback(error, null);
@@ -70,16 +71,45 @@ function getAllBills(decodeData, callback) {
 */
 function getbillbyID(decodeData, payload, callback) {
     const id = payload.id
-    billDao.getByID(decodeData.data, id, function (error, result) {
+    billDao.findOne(id, function (error, resultFromBills) {
         if (error) {
-            LOGGER.error("error in get bill by id " + File_Name)
-            return callback(error, null)
+            LOGGER.error("Error in finding ID " + File_Name)
+            return callback(error, null);
         }
         else {
-            LOGGER.info("get bill by id successfull " + File_Name)
-            return callback(null, result)
+            LOGGER.debug("Entering getBillById " + File_Name)
+            if (resultFromBills) {
+                userDao.getUserID(decodeData.data, function (error, resultOFUserId) {
+                    if (error) {
+                        LOGGER.error("Error in finding user ID " + File_Name)
+                        return callback(error, null)
+                    }
+
+                    if (resultFromBills.owner_id == resultOFUserId.dataValues.id) {
+                        return callback(null, resultFromBills)
+                    }
+                    else {
+                        return callback(CONSTANTS.ERROR_DESCRIPTION.UNAUTHORIZED, null)
+                    }
+                })
+            }
+            else {
+                LOGGER.error("Bill Id not found " + File_Name);
+                return callback(null, CONSTANTS.ERROR_DESCRIPTION.NOT_FOUND)
+            }
         }
     })
+
+    // billDao.getByID(decodeData.data, id, function (error, result) {
+    //     if (error) {
+    //         LOGGER.error("error in get bill by id " + File_Name)
+    //         return callback(error, null)
+    //     }
+    //     else {
+    //         LOGGER.info("get bill by id successfull " + File_Name)
+    //         return callback(null, result)
+    //     }
+    // })
 }
 /**
 *@function 
@@ -91,14 +121,44 @@ function getbillbyID(decodeData, payload, callback) {
 */
 function deletebillbyID(decodeData, payload, callback) {
     const id = payload.id
-    billDao.deleteByID(decodeData.data, id, function (error, result) {
+    billDao.findOne(id, function (error, resultFromBills) {
         if (error) {
-            LOGGER.error("error in delete bill by id " + File_Name)
-            return callback(error, null)
+            LOGGER.error("Error in finding bill ID " + File_Name)
+            return callback(error, null);
         }
         else {
-            LOGGER.info("delete bill by id successfull " + File_Name)
-            return callback(null, result)
+            if (resultFromBills) {
+                LOGGER.debug("Entering delete bill by id " + File_Name)
+                userDao.getUserID(decodeData.data, function (error, resultOFUserId) {
+                    if (error) {
+                        LOGGER.error("Error in fiding userID " + File_Name)
+                        return callback(error, null)
+                    }
+                    else {
+                        if (resultFromBills.owner_id == resultOFUserId.dataValues.id) {
+                            billDao.destroy(id, function (error, result) {
+                                if (error) {
+                                    LOGGER.error("Error in destroy service " + File_Name)
+                                    return callback(error, null)
+                                }
+                                else {
+                                    LOGGER.debug("Destroy complete " + File_Name)
+                                    return callback(null, CONSTANTS.ERROR_DESCRIPTION.SUCCESS)
+                                }
+                            })
+                        }
+                        else {
+                            LOGGER.error("user not authorised to delete this bill " + File_Name)
+                            return callback(CONSTANTS.ERROR_DESCRIPTION.UNAUTHORIZED, null)
+                        }
+                    }
+                })
+            }
+            else {
+                LOGGER.debug("bill not found " + File_Name)
+                return callback(CONSTANTS.ERROR_DESCRIPTION.NOT_FOUND, null)
+            }
+
         }
     })
 }
@@ -112,19 +172,50 @@ function deletebillbyID(decodeData, payload, callback) {
 * @param {Object} callback
 */
 function updatebyid(decodeData, ID, payload, callback) {
-    billDao.updateByID(decodeData.data, ID, payload, function (error, result) {
+    billDao.findOne(ID, function (error, resultFromBills) {
         if (error) {
-            LOGGER.error("error in update bill by id " + File_Name)
+            LOGGER.error("Error in updating service " + File_Name)
             return callback(error, null)
         }
         else {
-            LOGGER.info("update bill by id successfull " + File_Name)
-            return callback(null, result)
+            if (resultFromBills) {
+                LOGGER.debug("Entering update by id service " + File_Name)
+                userDao.getUserID(decodeData.data, function (error, resultOFUserId) {
+                    if (error) {
+                        LOGGER.error("Error in finding the user " + File_Name)
+                        return callback(error, null)
+                    }
+                    else {
+                        if (resultFromBills.owner_id == resultOFUserId.dataValues.id) {
+                            billDao.update(ID, payload, function (error, result) {
+                                if (error) {
+                                    LOGGER.error("error in update service " + File_Name)
+                                    return callback(error, null)
+                                }
+                                else {
+                                    LOGGER.debug("Update service compter " + File_Name)
+                                    return callback(null, result)
+                                }
+                            })
+                        }
+                        else {
+                            LOGGER.error("User not authorised to update this bill " + File_Name)
+                            return callback(CONSTANTS.ERROR_DESCRIPTION.UNAUTHORIZED, null)
+                        }
+                    }
+                })
+            }
+            else {
+                LOGGER.error("No bill found " + File_Name)
+                return callback(CONSTANTS.ERROR_DESCRIPTION.NOT_FOUND, null)
+            }
+
+
         }
     })
 }
 module.exports = {
-    createUserService,
+    createBill,
     getAllBills,
     getbillbyID,
     deletebillbyID,

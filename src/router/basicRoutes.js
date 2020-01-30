@@ -81,7 +81,7 @@ router.get("/user/self", function (req, res) {
   const responseObj = {}
   let decodedData = {};
   const bearerHeader = req.headers.authorization;
-  if (typeof bearerHeader != undefined) {
+  if (typeof bearerHeader != "undefined") {
     const bearer = bearerHeader.split(' ')
     const bearerToken = bearer[1]
     decodedData.data = base64.decode(bearerToken);
@@ -89,6 +89,7 @@ router.get("/user/self", function (req, res) {
   else {
     res.statusCode = CONSTANTS.ERROR_CODE.UNAUTHORIZED
     responseObj.result = "unauthorised token";
+    res.send(responseObj);
   }
   userService.getUser(decodedData, function (error, result) {
     if (error) {
@@ -120,7 +121,7 @@ router.put("/user/self", function (req, res) {
   let responseObj = {}
   let decodedData = {};
   const bearerHeader = req.headers.authorization;
-  if (typeof bearerHeader != undefined) {
+  if (typeof bearerHeader != "undefined") {
     const bearer = bearerHeader.split(' ')
     const bearerToken = bearer[1]
     decodedData.data = base64.decode(bearerToken);
@@ -128,6 +129,7 @@ router.put("/user/self", function (req, res) {
   else {
     res.statusCode = CONSTANTS.ERROR_CODE.UNAUTHORIZED
     responseObj.result = "unauthorised token";
+    res.send(responseObj);
   }
   function checkPayload(req)
   {
