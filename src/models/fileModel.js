@@ -29,6 +29,10 @@ var Files = sequelize.define('attachments', {
   MD5hash: {
     type: Sequelize.STRING,
     allowNull:false
+    },
+    size: {
+        type: Sequelize.INTEGER,
+        allowNull:false
     }
 },
     {

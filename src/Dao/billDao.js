@@ -23,7 +23,16 @@ function create(billData, callback) {
     LOGGER.debug("Entering create bill " + File_Name);
     billModel.create(billData).then(function (bill) {
         LOGGER.info("new Bill created " + File_Name)
-        return callback(null, bill.get({ plain: true }))
+        billModel.findOne({ where: {id : bill.dataValues.id}, include: fileModel }).then(function(result)
+        {
+            LOGGER.debug("Find one after result complete "+File_Name)
+            return callback(null,result);
+        }).catch(function(error)
+        {
+            LOGGER.error("Error in find one after create")
+            return callback("Error in findone after create ",null);
+        })
+       // return callback(null, bill.get({ plain: true }))
     }).catch(function (error) {
         LOGGER.error("error in create Bill " + File_Name)
         return callback("error in create bill " + error, null)
