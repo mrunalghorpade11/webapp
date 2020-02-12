@@ -95,7 +95,7 @@ function getbillbyID(decodeData, payload, callback) {
             }
             else {
                 LOGGER.error("Bill Id not found " + File_Name);
-                return callback(null, CONSTANTS.ERROR_DESCRIPTION.NOT_FOUND)
+                return callback(CONSTANTS.ERROR_DESCRIPTION.NOT_FOUND, null)
             }
         }
     })

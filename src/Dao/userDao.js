@@ -53,7 +53,7 @@ async function getUser(dataObj, callback) {
 
             await bcrypt.compare(password, pass.password).then(async function (res) {
                 if (res == true) {
-                    let result = await userModel.findOne({ where: { email_address: userID, password: pass.password }, attributes: ['first_name', 'last_name', 'email_address', 'createdAt', 'updatedAt'] })
+                    let result = await userModel.findOne({ where: { email_address: userID, password: pass.password }, attributes: ['first_name', 'last_name', 'email_address', 'account_created', 'account_updated'] })
                     result.dataValues.account_created = result.dataValues.createdAt;
                     result.dataValues.account_updated = result.dataValues.updatedAt;
                     delete result.dataValues.createdAt;
