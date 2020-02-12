@@ -52,6 +52,8 @@ router.post("/bill", [
         responseObj.result = "unauthorised token";
         return res.send(responseObj);
     }
+    if(req.body.attachment)
+    delete req.body.attachment;
     billService.createBill(decodedData, req.body, function (error, result) {
         if (error) {
             res.statusCode = CONSTANTS.ERROR_CODE.BAD_REQUEST
@@ -102,6 +104,11 @@ router.get("/bills", function (req, res) {
         else {
             res.statusCode = CONSTANTS.ERROR_CODE.SUCCESS
             res.statusMessage = "OK"
+            for (var i in result)
+                {
+                    if(result.attachment)
+                    delete result[i].attachment.dataValues.MD5hash
+                }
             responseObj.result = result;
             res.send(responseObj);
         }
@@ -148,6 +155,8 @@ router.get("/bill/:id", function (req, res) {
         else {
             res.statusCode = CONSTANTS.ERROR_CODE.SUCCESS
             res.statusMessage = "OK"
+            if(result.attachment)
+            delete result.attachment.dataValues.MD5hash
             responseObj.result = result;
             res.send(responseObj);
         }
