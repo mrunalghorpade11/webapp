@@ -106,8 +106,10 @@ router.get("/bills", function (req, res) {
             res.statusMessage = "OK"
             for (var i in result)
                 {
-                    if(result.attachment)
+                    if(result[i].attachment){
                     delete result[i].attachment.dataValues.MD5hash
+                    delete result[i].attachment.dataValues.size
+                    }
                 }
             responseObj.result = result;
             res.send(responseObj);
@@ -155,8 +157,10 @@ router.get("/bill/:id", function (req, res) {
         else {
             res.statusCode = CONSTANTS.ERROR_CODE.SUCCESS
             res.statusMessage = "OK"
-            if(result.attachment)
+            if(result.attachment){
             delete result.attachment.dataValues.MD5hash
+            delete result.attachment.dataValues.size
+            }
             responseObj.result = result;
             res.send(responseObj);
         }

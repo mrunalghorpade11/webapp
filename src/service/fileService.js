@@ -26,7 +26,8 @@ function addFile(decodeData, payload, fileData, callback) {
                     bill_id: result.dataValues.id,
                     file_name: fileData.originalname,
                     url: fileData.path,
-                    MD5hash: fileData.hash
+                    MD5hash: fileData.hash,
+                    size : fileData.size
                 }
                 fileDao.addFile(filePayload, function (error, result) {
                     if (error) {
