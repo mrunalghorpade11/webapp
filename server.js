@@ -36,3 +36,9 @@ var server = app.listen(port, function () {
   LOGGER.debug("Express server listening on port %s.", port);
 });
 module.exports = app;
+
+// error handler
+app.use(function(err, req, res, next) {
+  res.status(400);
+  res.send(err);
+});

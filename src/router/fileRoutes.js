@@ -36,7 +36,7 @@ var storage = multer.diskStorage({
             !file.mimetype.includes("png") &&
             !file.mimetype.includes("application/pdf")
         ) {
-            return cb("Not correct format", false);
+            return cb({"error":"Not correct formart"}, false);
         }
         var fileName = file.originalname.split(".");
         cb(null, fileName[0] + Date.now() + "." + fileName[1]);
