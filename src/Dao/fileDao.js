@@ -10,28 +10,25 @@ const LOGGER = require("../logger/logger");
 const File_Name = "fileDao.js"
 const CONSTANTS = require("../constants/constants")
 var fs = require('fs');
-
+var aws = require('aws-sdk')
+var s3 = new aws.S3()
 function addFile(fileData, callback) {
     LOGGER.debug("Entering add file DAO " + File_Name);
     fileModel.create(fileData).then(function (file) {
         LOGGER.info("new file attached " + File_Name)
         return callback(null, file.get({ plain: true }))
     }).catch(function (error) {
-        fs.unlinkSync(fileData.url);
-        return callback("Error in adding file ", null);
-        // fs.unlink(fileData.url,function(error)
-        // {
-        //     if(error)
-        //     {
-        //         LOGGER.error("error in deleting duplicate file from disk "+error+File_Name)
-        //         return callback("Error in deleting duplicate file");
-        //     }
-        //     LOGGER.debug("duplicate file deleted from disk "+error+File_Name)
-        //     return callback("error in adding a file ", null)
-            
-        // })
-        // LOGGER.error("Duplicate file " + File_Name)
-        
+        let params = {
+            Bucket: process.env.S3_BUCKET,
+            Key: fileData.key
+        };
+        s3.deleteObject(params, function (err, data) {
+            if (err)
+                return callback("Error in deleting from S3", null);
+            else
+                return callback("Error in adding file ", null);
+        })
+
     })
 }
 
@@ -55,27 +52,30 @@ function destroy(file_id, bill_id1, callback) {
     LOGGER.debug("Entering destroy " + File_Name);
     findOne(file_id, bill_id1, function (error, result) {
         if (result) {
-            fs.unlink(result.url, function (err) {
-                if (err) {
-                    LOGGER.error("Could not delete file " + File_Name);
-                    return callback("could not delete file ", null)
-                }
-                else {
-                    LOGGER.debug("File deleted from server ",File_Name);
-                    fileModel.destroy({ where: { id: file_id, bill_id: bill_id1 } }).then(function (deleted) {
-                        if (deleted >= 1) {
-                            LOGGER.debug("File deleted " + File_Name)
-                            return callback(null, "File Deleted successfully")
-                        }
-                        else {
-                            LOGGER.error("NO data to delete " + File_Name)
-                            return callback(CONSTANTS.ERROR_DESCRIPTION.NOT_FOUND, null);
-                        }
-                    }).catch(function (error) {
-                        LOGGER.error("error in destroy " + File_Name)
-                        return callback(error, null);
-                    })
-                }
+          //  console.log("result ",result);
+            let params = {
+                Bucket: process.env.S3_BUCKET,
+                Key: result.key
+            };
+            s3.deleteObject(params, function (err, data) {
+                if (err)
+                    return callback(err, null);
+                else
+                    {
+                        fileModel.destroy({ where: { id: file_id, bill_id: bill_id1 } }).then(function (deleted) {
+                            if (deleted >= 1) {
+                                LOGGER.debug("File deleted " + File_Name)
+                                return callback(null, "File Deleted successfully")
+                            }
+                            else {
+                                LOGGER.error("NO data to delete " + File_Name)
+                                return callback(CONSTANTS.ERROR_DESCRIPTION.NOT_FOUND, null);
+                            }
+                        }).catch(function (error) {
+                            LOGGER.error("error in destroy " + File_Name)
+                            return callback(error, null);
+                        }) 
+                    }
             })
         }
         else {

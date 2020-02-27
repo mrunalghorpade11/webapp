@@ -20,6 +20,7 @@ const port = 8080;
 const userModel = require(path.resolve(".") + "/src/models/user").User;
 const billsModel = require(path.resolve(".") + "/src/models/billModel").Bill;
 const fileModel = require(path.resolve(".")+ "/src/models/fileModel").Files;
+require('dotenv').config();
 
 userModel.hasMany(billsModel,{as: 'bills', foreignKey: 'owner_id'})
 //fileModel.belongsTo(billsModel,{as: 'files',foreignKey:'bill_id'});

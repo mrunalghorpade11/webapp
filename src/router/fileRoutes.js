@@ -6,6 +6,7 @@
  * @description file routes
  */
 const express = require("express");
+var aws = require('aws-sdk')
 const router = express.Router();
 const CONSTANTS = require("../constants/constants");
 const LOGGER = require("../logger/logger");
@@ -17,6 +18,8 @@ const md5 = require('md5-file');
 const FILE_NAME = "fileRoute.js";
 var path = require('path')
 var fs = require('fs');
+var multerS3 = require('multer-s3')
+
 
 /**
  * Endpoint to add fille to a bill
@@ -26,36 +29,47 @@ var fs = require('fs');
  * @param {object} res Response
  * @returns {object} responseObject
  */
-var storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, 'uploads/')
-    },
-    filename: function (req, file, cb) {
+aws.config.update({ region:process.env.AWS_REGION});
+var s3 = new aws.S3()
+var upload = multer({
+    storage: multerS3({
+      s3: s3,
+      bucket: process.env.S3_BUCKET,
+      metadata: function (req, file, cb) {
         if (!file.mimetype.includes("jpeg") &&
-            !file.mimetype.includes("jpg") &&
-            !file.mimetype.includes("png") &&
-            !file.mimetype.includes("application/pdf")
-        ) {
-            return cb({"error":"Not correct formart"}, false);
-        }
+        !file.mimetype.includes("jpg") &&
+        !file.mimetype.includes("png") &&
+        !file.mimetype.includes("application/pdf")
+    ) {
+        return cb({"error":"Not correct formart"}, false);
+    }
+        cb(null, {fieldName: file.fieldname});
+      },
+      key: function (req, file, cb) {
+        cb(null, file.originalname+Date.now());
+      },
+      filename: function (req, file, cb) {
         var fileName = file.originalname.split(".");
         cb(null, fileName[0] + Date.now() + "." + fileName[1]);
     }
-});
-var upload = multer({ storage: storage })
-
+    })
+  })
 router.post("/bill/:id/file",upload.single('file'),function (req, res) {
 
         LOGGER.info("Entering add file routes " + FILE_NAME);
         const responseObj = {}
         let decodedData = {};
+
         if (req.file == null) {
             res.statusCode = CONSTANTS.ERROR_CODE.BAD_REQUEST
             return res.send({"Error":"No file attached"});
         }
-        const pathformd5 = req.file.path
-        const hash = md5.sync(pathformd5);
+        console.log("file",req.file);
+        const pathformd5 = req.file.location
+      //  const hash = md5.sync(pathformd5);
+      const hash = "abcd";
         req.file.hash = hash
+     
         const bearerHeader = req.headers.authorization;
         if (typeof bearerHeader != "undefined") {
             const bearer = bearerHeader.split(' ')
@@ -76,7 +90,6 @@ router.post("/bill/:id/file",upload.single('file'),function (req, res) {
                 res.statusMessage = "Bad Request"
                 responseObj.error = error
                 res.send(responseObj);
-
             }
             else {
                 res.statusCode = CONSTANTS.ERROR_CODE.CREATED
@@ -87,8 +100,6 @@ router.post("/bill/:id/file",upload.single('file'),function (req, res) {
                 res.send(responseObj);
             }
         })
-   
-
 })
 
 router.get("/bill/:bill_id/file/:file_id", function (req, res) {

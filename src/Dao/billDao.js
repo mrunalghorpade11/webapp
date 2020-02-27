@@ -11,7 +11,9 @@ const userDao = require("../Dao/userDao")
 const LOGGER = require("../logger/logger");
 const File_Name = "billDao.js"
 const CONSTANTS = require("../constants/constants")
+var aws = require('aws-sdk')
 var fs = require('fs');
+var s3 = new aws.S3()
 /**
  *@function 
  * @name createBill
@@ -83,23 +85,29 @@ function destroy(billID, callback) {
     billModel.findOne({
         where: { id: billID }, include: fileModel
     }).then(function (resultOfbillID) {
+       // console.log("resultofbillID ",resultOfbillID)
         LOGGER.debug("bill ID found " + File_Name)
-        if (resultOfbillID.attachment != null)
+        if (resultOfbillID.dataValues.attachment != null)
         {
-            fs.unlink(resultOfbillID.attachment.url, function (error) {
-                if (error) {
-                    LOGGER.error("Error deleting file from disk " + error, +File_Name);
-                    return callback("Error deleting file from disk", null);
-                }
-                LOGGER.trace("File deleted from disk " + File_Name);
-                billModel.destroy({ where: { id: billID } }).then(function (resultFromDestroy) {
+            let params = {
+                Bucket: process.env.S3_BUCKET, 
+                Key: resultOfbillID.dataValues.attachment.key
+               };
+               s3.deleteObject(params, function (err, data) {
+                if (err)
+                    return callback(err, null);
+                else{
+                   // console.log("data, aftr deleting from s3 ",data);
+                    LOGGER.trace("File deleted from S3 " + File_Name);
+                        billModel.destroy({ where: { id: billID } }).then(function (resultFromDestroy) {
                     LOGGER.debug("Bill deleted by detroy function " + File_Name)
                     return callback(null, resultFromDestroy);
                 }).catch(function (error) {
                     LOGGER.error("error in deleting bill");
                     return callback(error, null);
                 })
-
+                 
+                }
             })
         }
         else{
@@ -119,38 +127,6 @@ function destroy(billID, callback) {
         LOGGER.error("Error in finding Bill ID " + File_Name)
         return callback(error, null)
     });
-    // findOne(billID,function(error,result)
-    // {
-    //     if(error)
-    //     {
-    //         LOGGER.debug("Bill not found for deletion ",+error,+File_Name)
-    //         return callback("Bill not found for deletion "+File_Name)
-    //     }
-    //     else
-    //     {
-    //         LOGGER.debug("bill found for deletion "+File_Name)
-    //         fs.unlink(result.file.url,function(error)
-    //         {
-    //             if(error)
-    //             {
-    //                 LOGGER.error("Error in deleting file from disk "+File_Name)
-    //                 return callback("Error in deleting file from disk ",null)
-    //             }
-    //             else{
-    //                 LOGGER.trace("File deleted from disk "+File_Name)
-    //                 billModel.destroy({ where: { id: billID } }).then(function (resultFromDestroy) {
-    //                     LOGGER.debug("Bill deleted by detroy function " + File_Name)
-    //                     return callback(null, resultFromDestroy);
-    //                 }).catch(function (error) {
-    //                     LOGGER.error("error in deleting bill");
-    //                     return callback(error, null);
-    //                 })
-    //             }
-    //         })
-    //     }
-    // })
-
-
 }
 function update(billID, payload, callback) {
     billModel.update(payload, { where: { id: billID } }).then(function (result) {

@@ -11,6 +11,7 @@ const CONSTANTS = require('../constants/constants');
 const fileDao = require('../Dao/fileDao');
 const billService = require('../service/billService');
 const uuidv4 = require('uuid/v4');
+var aws = require('aws-sdk')
 
 function addFile(decodeData, payload, fileData, callback) {
     LOGGER.debug("entering add file service " + File_Name);
@@ -21,14 +22,17 @@ function addFile(decodeData, payload, fileData, callback) {
         }
         else {
             if (result) {
+              
                 filePayload = {
                     id: uuidv4(),
                     bill_id: result.dataValues.id,
                     file_name: fileData.originalname,
-                    url: fileData.path,
+                    url: fileData.location,
                     MD5hash: fileData.hash,
-                    size : fileData.size
+                    size : fileData.size,
+                    key: fileData.key
                 }
+               // console.log("filepayload ",filePayload)
                 fileDao.addFile(filePayload, function (error, result) {
                     if (error) {
                         LOGGER.error("Error in add file service " + File_Name)
