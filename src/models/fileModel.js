@@ -33,6 +33,10 @@ var Files = sequelize.define('attachments', {
     size: {
         type: Sequelize.INTEGER,
         allowNull:false
+    },
+    key:{
+        type: Sequelize.STRING,
+        allowNull:false
     }
 },
     {

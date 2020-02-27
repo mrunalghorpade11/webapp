@@ -12,9 +12,9 @@ const contextPath = {
     contextPath: "/assignment"
 }
 var Sequelize = require('sequelize');
-var sequelize = new Sequelize('CSYE6225', 'A', '1234',
+var sequelize = new Sequelize('CSYE6225',process.env.DB_USERNAME,process.env.DB_PASSWORD,
     {
-        host: 'localhost',
+        host: process.env.DB_HOST,
         dialect: 'mariadb'
     }
 
