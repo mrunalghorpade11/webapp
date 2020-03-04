@@ -64,8 +64,6 @@ jobs:
 
       # run tests!
       - run: yarn test
-  orbs:
-    aws-s3: circleci/aws-s3@1.0.15
   build:
     docker:
       # specify the version you desire here
@@ -106,7 +104,8 @@ jobs:
 
       # run tests!
       - run: yarn test
-
+orbs:
+  aws-s3: circleci/aws-s3@1.0.15
 workflows:
   version: 2
   pr-check:
