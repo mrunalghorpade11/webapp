@@ -26,6 +26,14 @@ jobs:
     steps:
       - checkout
       - run: mkdir bucket && echo "test test" > bucket/build_asset.txt
+      - run: yarn install
+      - run: 
+          command: |
+            sudo apt update 
+            sudo apt install curl -y
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install -y
       - aws-s3/sync:
           arguments: |
             --acl public-read \
@@ -47,7 +55,7 @@ jobs:
             # fallback to using the latest cache if no exact match is found
             - v1-dependencies-
 
-      - run: yarn install
+
       #- run: node server.js
       - save_cache:
           paths:
