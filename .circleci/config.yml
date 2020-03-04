@@ -27,19 +27,19 @@ jobs:
       - checkout
       - run: mkdir bucket && echo "test test" > bucket/build_asset.txt
             - aws-s3/sync:
-          arguments: |
-            --acl public-read \
-            --cache-control "max-age=86400"
-          aws-access-key-id: $AWS_ACCESS_KEY
-          aws-region: $AWS_REGION
-          aws-secret-access-key: $Secret_access_key
-          from: bucket
-          overwrite: true
-          to: 's3://my-s3-bucket-name/prefix'
-      - aws-s3/copy:
-          arguments: '--dry-run'
-          from: bucket/build_asset.txt
-          to: 's3://circlecicsye6225'
+                arguments: |
+                  --acl public-read \
+                  --cache-control "max-age=86400"
+                aws-access-key-id: $AWS_ACCESS_KEY
+                aws-region: $AWS_REGION
+                aws-secret-access-key: $Secret_access_key
+                from: bucket
+                overwrite: true
+                to: 's3://my-s3-bucket-name/prefix'
+            - aws-s3/copy:
+                arguments: '--dry-run'
+                from: bucket/build_asset.txt
+                to: 's3://circlecicsye6225'
       # Download and cache dependencies
       - restore_cache:
           keys:
