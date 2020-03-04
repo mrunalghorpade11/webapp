@@ -10,11 +10,11 @@ jobs:
       - image: circleci/node:10
       - image: circleci/mariadb:10.2
         environment:
-          MYSQL_TCP_PORT: 3306
+          MYSQL_TCP_PORT: $DB_PORT
           MYSQL_ROOT_PASSWORD:
-          MYSQL_DATABASE: CSYE6225
-          MYSQL_USER: A
-          MYSQL_PASSWORD: 1234
+          MYSQL_DATABASE: $DBNAME
+          MYSQL_USER: $DB_USERNAME
+          MYSQL_PASSWORD: $DB_PASSWORD
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
@@ -25,7 +25,21 @@ jobs:
 
     steps:
       - checkout
-
+      - run: mkdir bucket && echo "test test" > bucket/build_asset.txt
+            - aws-s3/sync:
+          arguments: |
+            --acl public-read \
+            --cache-control "max-age=86400"
+          aws-access-key-id: $AWS_ACCESS_KEY
+          aws-region: $AWS_REGION
+          aws-secret-access-key: $Secret_access_key
+          from: bucket
+          overwrite: true
+          to: 's3://my-s3-bucket-name/prefix'
+      - aws-s3/copy:
+          arguments: '--dry-run'
+          from: bucket/build_asset.txt
+          to: 's3://circlecicsye6225'
       # Download and cache dependencies
       - restore_cache:
           keys:
@@ -35,8 +49,6 @@ jobs:
 
       - run: yarn install
       #- run: node server.js
-
-
       - save_cache:
           paths:
             - node_modules
@@ -44,17 +56,19 @@ jobs:
 
       # run tests!
       - run: yarn test
+  orbs:
+    aws-s3: circleci/aws-s3@1.0.15
   build:
     docker:
       # specify the version you desire here
       - image: circleci/node:10
       - image: circleci/mariadb:10.2
         environment:
-          MYSQL_TCP_PORT: 3306
+          MYSQL_TCP_PORT: $DB_PORT
           MYSQL_ROOT_PASSWORD:
-          MYSQL_DATABASE: CSYE6225
-          MYSQL_USER: A
-          MYSQL_PASSWORD: 1234
+          MYSQL_DATABASE: $DBNAME
+          MYSQL_USER: $DB_USERNAME
+          MYSQL_PASSWORD: $DB_PASSWORD
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
