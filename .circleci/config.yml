@@ -48,7 +48,7 @@ jobs:
       - aws-s3/copy:
           arguments: '--dry-run'
           from: bucket/build_asset.txt
-          to: 's3://circlecicsye6225'
+          to: 's3://${bucket_name}'
       # Download and cache dependencies
       - restore_cache:
           keys:
@@ -108,7 +108,7 @@ jobs:
 orbs:
   aws-s3: circleci/aws-s3@1.0.15
 workflows:
-  version: 2
+  version: 2.1
   pr-check:
     jobs:
       - pr_check
