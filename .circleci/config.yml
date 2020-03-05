@@ -18,7 +18,6 @@ jobs:
           aws-region: $AWS_REGION
 
       - run: echo "Run your code here"
-jobs:
   pr_check:
     docker:
       # specify the version you desire here
