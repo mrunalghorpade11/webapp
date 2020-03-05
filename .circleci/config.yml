@@ -120,9 +120,6 @@ jobs:
 
 workflows:
   version: 2
-  aws-cli:
-    jobs:
-      - aws-cli
   pr-check:
     jobs:
       - pr_check
