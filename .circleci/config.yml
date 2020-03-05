@@ -7,17 +7,6 @@ orbs:
   aws-cli: circleci/aws-cli@0.1.20
   aws-s3: circleci/aws-s3@1.0.15
 jobs:
-  aws-cli:
-    executor: aws-cli/default
-    steps:
-      - checkout
-      - aws-cli/setup:
-          profile-name: 'dev'
-          aws-access-key-id: $AWS_ACCESS_KEY
-          aws-secret-access-key: $Secret_access_key
-          aws-region: $AWS_REGION
-
-      - run: echo "Run your code here"
   pr_check:
     docker:
       # specify the version you desire here
@@ -39,8 +28,6 @@ jobs:
 
     steps:
       - checkout
-      - run: mkdir bucket && echo "test test" > bucket/build_asset.txt
-
       # Download and cache dependencies
       - restore_cache:
           keys:
@@ -56,18 +43,40 @@ jobs:
 
       # run tests!
       - run: yarn test
-      - run: mkdir bucket && echo "test test" > bucket/build_asset.txt
-      - aws-s3/sync:
-          arguments: |
-            --acl public-read \
-            --cache-control "max-age=86400"
-          from: bucket
-          overwrite: true
-          to: 's3://$bucket_name/webapp'
-      - aws-s3/copy:
-          arguments: '--dry-run'
-          from: bucket/build_asset.txt
-          to: 's3://$bucket_name'
+      - run: 
+          name: Install AWSCLI
+          command : |
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
+            aws configure set default.region ${AWS_REGION} --profile ${AWS_PROFILE}
+            aws configure set aws_access_key_id ${AWS_ACCESS_KEY}
+            aws configure set aws_secret_access_key ${Secret_access_key}
+            echo 'CLI configured for profile' ${AWS_PROFILE}
+      - run:
+          name: Build artifacts
+          command: |
+            pwd
+            npm build
+            mkdir -p codedeploy_artifacts
+            pwd
+            cd codedeploy_artifacts
+            ls -a
+            pws
+            cp ../*.json .
+            cp ../*.md .
+            cp ../*.js .
+            cp -r ../src/*router .
+            cp -r ../src/*service .
+            cp -r ../src/*Dao .
+            cp -r ../src/*utils .
+            cp -r ../src/*constants .
+            pwd
+            zip -r csye6225-webapp.zip . -i .
+            ls -a
+            aws s3 cp csye6225-webapp.zip s3://${bucket_name} --sse
+            echo 'upload to s3 done'
+
   build:
     docker:
       # specify the version you desire here
