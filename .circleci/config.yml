@@ -34,16 +34,17 @@ jobs:
             curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
             unzip awscliv2.zip
             sudo ./aws/install -y
+            echo "aws cli installed"
       - aws-s3/sync:
           arguments: |
             --acl public-read \
             --cache-control "max-age=86400"
-          aws-access-key-id: $AWS_ACCESS_KEY
-          aws-region:  $AWS_REGION
-          aws-secret-access-key: $Secret_access_key
+          aws-access-key-id: ${AWS_ACCESS_KEY}
+          aws-region:  ${AWS_REGION}
+          aws-secret-access-key: ${Secret_access_key}
           from: bucket
           overwrite: true
-          to: 's3://circlecicsye6225/prefix'
+          to: 's3://${bucket_name}/prefix'
       - aws-s3/copy:
           arguments: '--dry-run'
           from: bucket/build_asset.txt
