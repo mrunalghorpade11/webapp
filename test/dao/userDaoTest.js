@@ -16,17 +16,17 @@ describe("insertUser method present", function () {
         expect(typeof userDao.createUsers).equals("function");
     })
 })
-describe("Should save user in DB", function () {
-    it("Should save a user to the DB", function (done) {
-        var hashedPassword = bcrypt.hashSync(payloadForTest.password, 8);
-        delete payloadForTest.password;
-        payloadForTest.password = hashedPassword
+// describe("Should save user in DB", function () {
+//     it("Should save a user to the DB", function (done) {
+//         var hashedPassword = bcrypt.hashSync(payloadForTest.password, 8);
+//         delete payloadForTest.password;
+//         payloadForTest.password = hashedPassword
 
-        userDao.createUsers(payloadForTest, function (error, result) {
-            if (error == 'user alread exists') done();
-            else if (error)
-                done(error)
-            else done();
-        })
-    });
-})
+//         userDao.createUsers(payloadForTest, function (error, result) {
+//             if (error == 'user alread exists') done();
+//             else if (error)
+//                 done(error)
+//             else done();
+//         })
+//     });
+// })
