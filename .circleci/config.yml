@@ -67,24 +67,9 @@ jobs:
           name: Build artifacts
           command: |
             pwd
-            npm build
-            mkdir -p codedeploy_artifacts
-            pwd
-            cd codedeploy_artifacts
+            zip -r csye6225-webapp.zip . 
             ls -a
-            pwd
-            cp ../*.json .
-            cp ../*.md .
-            cp ../*.js .
-            cp -r ../src/*router .
-            cp -r ../src/*service .
-            cp -r ../src/*Dao .
-            cp -r ../src/*utils .
-            cp -r ../src/*constants .
-            pwd
-            zip -r csye6225-webapp.zip . -i .
-            ls -a
-            aws s3 cp csye6225-webapp.zip s3://codedeploy.mrunal.ghorpade.me
+            aws s3 cp csye6225-webapp.zip s3://${bucket_name}
             echo 'upload to s3 done'
 
   build:
