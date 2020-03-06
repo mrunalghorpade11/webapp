@@ -61,36 +61,31 @@ jobs:
             curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
             unzip awscliv2.zip
             sudo ./aws/install
+
+
+      - run:
+          name: Build artifacts
+          command: |
             pwd
-            which aws
-            aws configure set region us-east-1 --profile $AWS_PROFILE 
-            aws configure set aws_access_key_id ${AWS_ACCESS_KEY} --profile $AWS_PROFILE
-            aws configure set aws_secret_access_key ${Secret_access_key} --profile $AWS_PROFILE
-
-
-      # - run:
-      #     name: Build artifacts
-      #     command: |
-      #       pwd
-      #       npm build
-      #       mkdir -p codedeploy_artifacts
-      #       pwd
-      #       cd codedeploy_artifacts
-      #       ls -a
-      #       pwd
-      #       cp ../*.json .
-      #       cp ../*.md .
-      #       cp ../*.js .
-      #       cp -r ../src/*router .
-      #       cp -r ../src/*service .
-      #       cp -r ../src/*Dao .
-      #       cp -r ../src/*utils .
-      #       cp -r ../src/*constants .
-      #       pwd
-      #       zip -r csye6225-webapp.zip . -i .
-      #       ls -a
-      #       aws s3 cp csye6225-webapp.zip s3://${bucket_name} --sse --profile example
-      #       echo 'upload to s3 done'
+            npm build
+            mkdir -p codedeploy_artifacts
+            pwd
+            cd codedeploy_artifacts
+            ls -a
+            pwd
+            cp ../*.json .
+            cp ../*.md .
+            cp ../*.js .
+            cp -r ../src/*router .
+            cp -r ../src/*service .
+            cp -r ../src/*Dao .
+            cp -r ../src/*utils .
+            cp -r ../src/*constants .
+            pwd
+            zip -r csye6225-webapp.zip . -i .
+            ls -a
+            aws s3 cp csye6225-webapp.zip s3://${bucket_name} --sse --profile example
+            echo 'upload to s3 done'
 
   build:
     docker:
