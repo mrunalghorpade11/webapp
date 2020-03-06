@@ -56,7 +56,7 @@ jobs:
             pwd
             cd codedeploy_artifacts
             ls -a
-            pws
+            pwd
             cp ../*.json .
             cp ../*.md .
             cp ../*.js .
