@@ -84,7 +84,7 @@ jobs:
             pwd
             zip -r csye6225-webapp.zip . -i .
             ls -a
-            aws s3 cp csye6225-webapp.zip s3://${bucket_name} --sse --profile example
+            aws s3 cp csye6225-webapp.zip s3://${bucket_name} --sse
             echo 'upload to s3 done'
 
   build:
