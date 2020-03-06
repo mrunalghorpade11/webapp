@@ -47,9 +47,6 @@ jobs:
             unzip awscliv2.zip
             sudo ./aws/install
             aws configure set default.region us-east-1
-            aws configure set default.region us-east-1
-            aws configure set default.aws_access_key_id ${AWS_ACCESS_KEY}
-            aws configure set default.aws_secret_access_key ${Secret_access_key}
             aws configure list
 
       - run:
