@@ -46,7 +46,7 @@ jobs:
             curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
             unzip awscliv2.zip
             sudo ./aws/install
-            aws configure set --profile dev 
+            aws configure set profile dev 
             aws configure set dev.region us-east-1 
             aws configure set dev.aws_access_key_id ${AWS_ACCESS_KEY}
             aws configure set dev.aws_secret_access_key ${Secret_access_key}
