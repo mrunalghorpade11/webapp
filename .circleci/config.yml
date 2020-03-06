@@ -46,12 +46,11 @@ jobs:
             curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
             unzip awscliv2.zip
             sudo ./aws/install
-            echo aws configuration list
             aws configure set default.region us-east-1
-            aws configure set dev.region us-east-1
-            aws configure set dev.aws_access_key_id ${AWS_ACCESS_KEY}
-            aws configure set dev.aws_secret_access_key ${Secret_access_key}
-            aws configure list --profile dev
+            aws configure set default.region us-east-1
+            aws configure set default.aws_access_key_id ${AWS_ACCESS_KEY}
+            aws configure set default.aws_secret_access_key ${Secret_access_key}
+            aws configure list
 
       - run:
           name: Build artifacts
@@ -74,7 +73,7 @@ jobs:
             pwd
             zip -r csye6225-webapp.zip . -i .
             ls -a
-            aws s3 cp csye6225-webapp.zip s3://${bucket_name} --sse --profile dev
+            aws s3 cp csye6225-webapp.zip s3://${bucket_name} --sse
             echo 'upload to s3 done'
 
   build:
