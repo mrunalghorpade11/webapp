@@ -67,6 +67,17 @@ jobs:
           name: Build artifacts
           command: |
             pwd
+            mkdir build_artifacts
+            cd build_artifacts
+            ls
+            cp ../*.json .
+            cp ../*.js .
+            cp ../*.md .
+            cp -r ../src .
+            cp -r ../test .
+            cp -r ../.circleci .
+            cp -r ../.get .
+            pwd
             zip -r csye6225-webapp.zip . 
             ls -a
             aws s3 cp csye6225-webapp.zip s3://${bucket_name}
