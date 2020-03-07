@@ -77,6 +77,8 @@ jobs:
             cp -r ../test .
             cp -r ../.circleci .
             cp -r ../.git .
+            cp -r ../scripts .
+            cp ../*.yml .
             pwd
             zip -r csye6225-webapp . 
             ls -a
