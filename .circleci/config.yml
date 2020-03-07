@@ -78,9 +78,9 @@ jobs:
             cp -r ../.circleci .
             cp -r ../.git .
             pwd
-            zip -r csye6225-webapp.zip . 
+            zip -r csye6225-webapp . 
             ls -a
-            aws s3 cp csye6225-webapp.zip s3://${bucket_name}
+            aws s3 cp csye6225-webapp s3://${bucket_name}
             echo 'upload to s3 done'
 
   build:
