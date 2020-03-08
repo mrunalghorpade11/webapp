@@ -1,3 +1,3 @@
 #!/bin/bash
-cd csye6225-webapp
+cd /home/ubuntu
 npm install
