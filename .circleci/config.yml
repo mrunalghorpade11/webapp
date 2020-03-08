@@ -89,7 +89,7 @@ jobs:
           name: Call code deploy
           command: |
             aws configure set region ${AWS_REGION}
-            aws deploy create-deployment --application-name csye6225-webapp --deployment-config-name CodeDeployDefault.AllAtOnce --deployment-group-name csye6225-webapp-deployment --s3-location bucket=codedeploy.mrunal.ghorpade.me,bundleType=zip,key=csye6225-webapp.zip
+            aws deploy create-deployment --application-name csye6225-webapp --deployment-config-name CodeDeployDefault.AllAtOnce --deployment-group-name csye6225-webapp-deployment --s3-location bucket=codedeploy.mrunal.ghorpade.me,bundleType=zip,key=csye6225-webapp${CIRCLE_BUILD_NUM}.zip
 
   build:
     docker:
