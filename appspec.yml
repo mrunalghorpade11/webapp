@@ -6,6 +6,6 @@ hooks:
      timeout: 180
      runas: root
   ApplicationStart:
-    - location: srcipts/npm-start.sh
+    - location: scripts/npm-start.sh
       runas: root
       timeout: 60
