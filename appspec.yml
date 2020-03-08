@@ -1,5 +1,8 @@
 version: 0.0
 os: linux
+files:
+  - source: /
+    destination: /var/api/
 hooks:
   AfterInstall:
    - location: scripts/npm-install.sh
