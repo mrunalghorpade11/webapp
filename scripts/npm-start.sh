@@ -5,4 +5,4 @@ cd ..
 ls -a
 cd ..
 ls -a
-node ../server.js
+node server.js
