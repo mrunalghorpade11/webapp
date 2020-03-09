@@ -7,8 +7,8 @@ hooks:
   AfterInstall:
    - location: scripts/npm-install.sh
      timeout: 180
-     runas: root
+     runas: ubuntu
   ApplicationStart:
     - location: scripts/npm-start.sh
-      runas: root
+      runas: ubuntu
       timeout: 60
