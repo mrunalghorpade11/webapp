@@ -1,4 +1,8 @@
 #!/bin/bash
 cd /home/ubuntu
-cp ../../etc/profile.d/custom.sh .env
+cd ..
+cd ..
+cd etc/profile.d
+cp custom.sh /home/ubuntu/.env
+cd /home/ubuntu
 npm start
