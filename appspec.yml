@@ -4,11 +4,15 @@ files:
   - source: /
     destination: /home/ubuntu
 hooks:
+  BeforeInstall:
+   - location: scripts/npm-before_install.sh
+     timeout: 180
+     runas: ubuntu
   AfterInstall:
    - location: scripts/npm-install.sh
      timeout: 180
      runas: ubuntu
   ApplicationStart:
-    - location: scripts/npm-start.sh
-      runas: ubuntu
-      timeout: 60
+   - location: scripts/npm-start.sh
+     runas: ubuntu
+     timeout: 60

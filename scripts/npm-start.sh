@@ -1,3 +1,3 @@
 #!/bin/bash
 cd /home/ubuntu
-npm start
+pm2 start server.js
