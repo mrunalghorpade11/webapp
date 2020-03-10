@@ -79,6 +79,7 @@ jobs:
             cp -r ../.git .
             cp -r ../scripts .
             cp ../*.yml .
+            touch .env
             pwd
             zip -r csye6225-webapp . 
             ls -a
