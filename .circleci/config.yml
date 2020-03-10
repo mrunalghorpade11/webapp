@@ -67,8 +67,8 @@ jobs:
           name: Build artifacts
           command: |
             pwd
-            mkdir build_artifacts
-            cd build_artifacts
+            mkdir webapp
+            cd webapp
             ls
             cp ../*.json .
             cp ../*.js .
@@ -80,7 +80,8 @@ jobs:
             cp -r ../scripts .
             cp ../*.yml .
             pwd
-            zip -r csye6225-webapp . 
+            cd ..
+            zip -r csye6225-webapp webapp 
             ls -a
             aws s3 cp csye6225-webapp.zip s3://${bucket_name}
             echo 'upload to s3 done'
