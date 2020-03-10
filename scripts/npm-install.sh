@@ -5,6 +5,6 @@ cd ..
 cd /etc/profile.d
 sudo cp custom.sh /home/ubuntu
 cd /home/ubuntu
-cp custom.sh .env
+cat custom.sh >> .env
 sudo chmod 666 .env
 npm install
