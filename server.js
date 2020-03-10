@@ -29,9 +29,9 @@ billsModel.hasOne(fileModel,{foreignKey: 'bill_id',onDelete: 'CASCADE'});
 app.use(bodyParser.json());
 app.use(cors());
 //Routes
-app.use("/v1", basicrouter);
-app.use("/v1", billRoutes);
-app.use("/v1",fileRoutes);
+app.use("/v2", basicrouter);
+app.use("/v2", billRoutes);
+app.use("/v2",fileRoutes);
 
 var server = app.listen(port, function () {
   LOGGER.debug("Express server listening on port %s.", port);

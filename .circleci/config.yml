@@ -2,19 +2,22 @@
 #
 # Check https://circleci.com/docs/2.0/language-javascript/ for more details
 #
-version: 2
+version: 2.1
+# orbs:
+#   aws-cli: circleci/aws-cli@0.1.21
 jobs:
   pr_check:
+    # executor: aws-cli/default
     docker:
       # specify the version you desire here
       - image: circleci/node:10
       - image: circleci/mariadb:10.2
         environment:
-          MYSQL_TCP_PORT: 3306
+          MYSQL_TCP_PORT: $DB_PORT
           MYSQL_ROOT_PASSWORD:
-          MYSQL_DATABASE: CSYE6225
-          MYSQL_USER: A
-          MYSQL_PASSWORD: 1234
+          MYSQL_DATABASE: $DBNAME
+          MYSQL_USER: $DB_USERNAME
+          MYSQL_PASSWORD: $DB_PASSWORD
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
@@ -25,18 +28,15 @@ jobs:
 
     steps:
       - checkout
-
       # Download and cache dependencies
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "package.json" }}
             # fallback to using the latest cache if no exact match is found
             - v1-dependencies-
-
+      - run: sudo apt-get update
       - run: yarn install
       #- run: node server.js
-
-
       - save_cache:
           paths:
             - node_modules
@@ -44,17 +44,18 @@ jobs:
 
       # run tests!
       - run: yarn test
+
   build:
     docker:
       # specify the version you desire here
       - image: circleci/node:10
       - image: circleci/mariadb:10.2
         environment:
-          MYSQL_TCP_PORT: 3306
+          MYSQL_TCP_PORT: $DB_PORT
           MYSQL_ROOT_PASSWORD:
-          MYSQL_DATABASE: CSYE6225
-          MYSQL_USER: A
-          MYSQL_PASSWORD: 1234
+          MYSQL_DATABASE: $DBNAME
+          MYSQL_USER: $DB_USERNAME
+          MYSQL_PASSWORD: $DB_PASSWORD
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
@@ -65,7 +66,6 @@ jobs:
 
     steps:
       - checkout
-
       # Download and cache dependencies
       - restore_cache:
           keys:
@@ -84,6 +84,50 @@ jobs:
 
       # run tests!
       - run: yarn test
+      - run: 
+          name: Install unzip
+          command: |
+            sudo apt install zip
+            sudo apt install unzip
+      - run: 
+          name: Install AWSCLI
+          command : |
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
+      - run:
+          name: Build artifacts
+          command: |
+            pwd
+            mkdir build_artifacts
+            cd build_artifacts
+            ls
+            cp ../*.json .
+            cp ../*.js .
+            cp ../*.md .
+            cp -r ../src .
+            cp -r ../test .
+            cp -r ../.circleci .
+            cp -r ../.git .
+            cp -r ../scripts .
+            cp ../*.yml .
+            touch .env
+            pwd
+            zip -r csye6225-webapp . 
+            ls -a
+            aws s3 cp csye6225-webapp.zip s3://${bucket_name}
+            echo 'upload to s3 done'
+      - run: 
+          name: Install less
+          command: |
+            sudo apt-get install less -y
+      - run:
+          name: Call code deploy
+          command: |
+            aws configure set region ${AWS_REGION}
+            aws deploy create-deployment --application-name csye6225-webapp --deployment-config-name CodeDeployDefault.AllAtOnce --deployment-group-name csye6225-webapp-deployment --s3-location bucket=codedeploy.mrunal.ghorpade.me,bundleType=zip,key=csye6225-webapp.zip
+
+
 
 workflows:
   version: 2
