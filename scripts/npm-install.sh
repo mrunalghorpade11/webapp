@@ -5,5 +5,5 @@ cd ..
 cd /etc/profile.d
 cp custom.sh /home/ubuntu
 cd /home/ubuntu
-rm custom.sh .env
+mv custom.sh .env
 npm install
