@@ -1,4 +1,4 @@
 #!/bin/bash
 cd /home/ubuntu
-print env.S3_BUCKET
+printenv
 node server.js
