@@ -1,3 +1,4 @@
 #!/bin/bash
 cd /home/ubuntu
-pm2 start server.js
+print env.S3_BUCKET
+node server.js
