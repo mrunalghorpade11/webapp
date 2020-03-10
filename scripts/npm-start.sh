@@ -1,4 +1,4 @@
 #!/bin/bash
 cd /home/ubuntu
 printenv
-node server.js
+pm2 start app.js server.js
