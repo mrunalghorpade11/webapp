@@ -3,6 +3,7 @@ cd /home/ubuntu
 cd ..
 cd ..
 cd /etc/profile.d
-cp custom.sh /home/ubuntu/webapp/.env
-cd /home/ubuntu/webapp
+cp custom.sh /home/ubuntu
+cd /home/ubuntu
+rm custom.sh .env
 npm install
