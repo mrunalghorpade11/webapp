@@ -17,6 +17,8 @@ const base64 = require('base-64');
 const { check, validationResult } = require('express-validator');
 const uuidv4 = require('uuid/v4');
 var passwordValidator = require('password-validator');
+const SDC = require('statsd-client'), 
+sdc = new SDC({host: 'localhost', port: 8125});
 /**
  * Endpoint to send user info to DB
  * @memberof basicnRoute.js
@@ -32,6 +34,7 @@ router.post("/user", [
   check('password').exists()
 ], async function (req, res) {
   LOGGER.info("Entering Get user Route" + FILE_NAME);
+  sdc.increment('POST User');
   let responseObj = {};
   const errors = validationResult(req)
   if (!errors.isEmpty()) {
