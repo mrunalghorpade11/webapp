@@ -9,6 +9,7 @@
   "author": "Mrunal",
   "license": "ISC",
   "dependencies": {
+    "app-root-path": "^3.0.0",
     "aws-sdk": "^2.626.0",
     "dotenv": "^8.2.0",
     "express-fileupload": "^1.1.6",
