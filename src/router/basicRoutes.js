@@ -80,6 +80,7 @@ router.post("/user", [
  * @returns {object} responseObject
  */
 router.get("/user/self", function (req, res) {
+  sdc.increment('GET User');
   LOGGER.info("Entering get user info routes " + FILE_NAME);
   //create responce object
   const responseObj = {}
@@ -121,6 +122,7 @@ router.get("/user/self", function (req, res) {
  * @returns {object} responseObject
  */
 router.put("/user/self", function (req, res) {
+  sdc.increment('PUT User');
   LOGGER.info("Entering PUT user info routes " + FILE_NAME);
   let responseObj = {}
   let decodedData = {};

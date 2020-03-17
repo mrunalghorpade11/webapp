@@ -14,6 +14,8 @@ const FILE_NAME = "basicRoute.js";
 const base64 = require('base-64');
 const { check, validationResult } = require('express-validator');
 const billService = require("../service/billService")
+const SDC = require('statsd-client'), 
+sdc = new SDC({host: 'localhost', port: 8125});
 /**
  * Endpoint to send Bill info to DB
  * @memberof billRoutes.js
@@ -30,6 +32,7 @@ router.post("/bill", [
     check('categories').exists(),
     check('paymentStatus').exists().isIn(['paid', 'due', 'past_due', 'no_payment_required'])
 ], function (req, res) {
+    sdc.increment('POST Bill');
     LOGGER.info("Entering get user info routes " + FILE_NAME);
     const responseObj = {}
     let decodedData = {};
@@ -79,6 +82,7 @@ router.post("/bill", [
  * @returns {object} responseObject
  */
 router.get("/bills", function (req, res) {
+    sdc.increment('GET Bill');
     const responseObj = {}
     let decodedData = {};
     const bearerHeader = req.headers.authorization;
@@ -118,6 +122,7 @@ router.get("/bills", function (req, res) {
 })
 
 router.get("/bill/:id", function (req, res) {
+    sdc.increment('GET Bill by ID');
     //create responce object
     const responseObj = {}
     let decodedData = {};
@@ -168,6 +173,7 @@ router.get("/bill/:id", function (req, res) {
 
 })
 router.delete("/bill/:id", function (req, res) {
+    sdc.increment('DELETE Bill by ID');
     const responseObj = {}
     let decodedData = {};
     const bearerHeader = req.headers.authorization;
@@ -222,6 +228,7 @@ router.put("/bill/:id",[
 ], function (req, res) {
     const responseObj = {}
     let decodedData = {};
+    sdc.increment('PUT Bill by ID');
     if(req.body.id || req.body.created_ts || req.body.updated_ts || req.body.owner_id)
     {
         return res.status(400).json("Do No add write only values")
