@@ -6,6 +6,7 @@
  * @description Logger
  */
 const log4js = require('log4js');
+const path = require("path");
 log4js.configure({
     appenders: {
         out: {
@@ -13,7 +14,7 @@ log4js.configure({
         },
         app: {
             type: 'file',
-            filename: 'app.log',
+            filename: `${path.resolve('.')}/src/logs/app.log`,
             maxLogSize: 10485760,
             backups: 1,
             compress: true
