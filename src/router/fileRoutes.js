@@ -19,6 +19,8 @@ const FILE_NAME = "fileRoute.js";
 var path = require('path')
 var fs = require('fs');
 var multerS3 = require('multer-s3')
+const SDC = require('statsd-client'), 
+sdc = new SDC({host: 'localhost', port: 8125});
 
 
 /**
@@ -29,8 +31,10 @@ var multerS3 = require('multer-s3')
  * @param {object} res Response
  * @returns {object} responseObject
  */
+
 aws.config.update({ region:process.env.AWS_REGION});
 var s3 = new aws.S3()
+let startDate = new Date()
 var upload = multer({
     storage: multerS3({
       s3: s3,
@@ -54,17 +58,18 @@ var upload = multer({
     }
     })
   })
+  let endDate = new Date();
+  var time = (endDate.getTime() - startDate.getTime())/1000;
+  sdc.timing('upload-file-to-s3',time)
 router.post("/bill/:id/file",upload.single('file'),function (req, res) {
 
         LOGGER.info("Entering add file routes " + FILE_NAME);
         const responseObj = {}
         let decodedData = {};
-
         if (req.file == null) {
             res.statusCode = CONSTANTS.ERROR_CODE.BAD_REQUEST
             return res.send({"Error":"No file attached"});
         }
-        console.log("file",req.file);
         const pathformd5 = req.file.location
       //  const hash = md5.sync(pathformd5);
       const hash = "abcd";
@@ -97,6 +102,7 @@ router.post("/bill/:id/file",upload.single('file'),function (req, res) {
                 delete result.MD5hash
                 delete result.size
                 responseObj.result = result;
+
                 res.send(responseObj);
             }
         })

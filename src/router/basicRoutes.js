@@ -34,7 +34,6 @@ router.post("/user", [
   check('password').exists()
 ], async function (req, res) {
   LOGGER.info("Entering Get user Route" + FILE_NAME);
-  sdc.increment('POST user');
   let responseObj = {};
   const errors = validationResult(req)
   if (!errors.isEmpty()) {
@@ -67,6 +66,7 @@ router.post("/user", [
       res.statusMessage = "User Created"
       delete result.password;
       responseObj.result = result;
+      sdc.increment('POST user');
       res.send(responseObj);
     }
   })
