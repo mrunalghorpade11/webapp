@@ -9,6 +9,8 @@ const userModel = require("../models/user").User;
 const LOGGER = require("../logger/logger");
 const File_Name = "userDao.js"
 const bcrypt = require('bcrypt');
+const SDC = require('statsd-client'),
+    sdc = new SDC({ host: 'localhost', port: 8125 });
 /**
  *@function 
  * @name createUser
@@ -86,6 +88,7 @@ async function editUser(data, payload, callback) {
     const userID = dataSplit[0];
     const password = dataSplit[1];
     //Find password in DB
+    let startDate = new Date();
     await userModel.findOne({ where: { email_address: userID }, attributes: ['password'] }).then(async function (pass) {
         //compare the password againt header password
         await bcrypt.compare(password, pass.password).then(function (res) {
@@ -96,6 +99,9 @@ async function editUser(data, payload, callback) {
                     .then(function (user) {
                         userModel.findOne({ where: { email_address: userID } }).then(function (user) {
                             LOGGER.debug("user found after update: ", File_Name)
+                            let endDate = new Date();
+                            let seconds = (endDate.getTime() - startDate.getTime()) / 1000;
+                            sdc.timing('edit-user-time', seconds);
                             return callback(null, "user updated")
                         }).catch(function (error) {
                             LOGGER.error("user not found after update ", File_Name)
