@@ -102,7 +102,7 @@ router.post("/bill/:id/file",upload.single('file'),function (req, res) {
                 delete result.MD5hash
                 delete result.size
                 responseObj.result = result;
-
+                LOGGER.info("Add file route complete" + FILE_NAME)
                 res.send(responseObj);
             }
         })
@@ -136,6 +136,7 @@ router.get("/bill/:bill_id/file/:file_id", function (req, res) {
             delete result.MD5hash
             delete result.size
             responseObj.result = result;
+            LOGGER.info("get file by id complete" + FILE_NAME)
             res.send(responseObj);
         }
     })

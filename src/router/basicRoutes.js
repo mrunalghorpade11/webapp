@@ -61,7 +61,7 @@ router.post("/user", [
       res.send(responseObj);
     }
     else {
-      LOGGER.debug("create success " + FILE_NAME);
+      LOGGER.info("create success " + FILE_NAME);
       res.statusCode = CONSTANTS.ERROR_CODE.CREATED;
       res.statusMessage = "User Created"
       delete result.password;
@@ -104,7 +104,7 @@ router.get("/user/self", function (req, res) {
       res.send(responseObj);
     }
     else {
-
+      LOGGER.info("GET user complete" + FILE_NAME)
       res.statusCode = CONSTANTS.ERROR_CODE.SUCCESS
       res.statusMessage = "OK"
       responseObj.result = result;
