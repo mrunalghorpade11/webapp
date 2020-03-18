@@ -21,8 +21,6 @@ var fs = require('fs');
 var multerS3 = require('multer-s3')
 const SDC = require('statsd-client'), 
 sdc = new SDC({host: 'localhost', port: 8125});
-
-
 /**
  * Endpoint to add fille to a bill
  * @memberof fillRoutes.js
@@ -31,10 +29,8 @@ sdc = new SDC({host: 'localhost', port: 8125});
  * @param {object} res Response
  * @returns {object} responseObject
  */
-
 aws.config.update({ region:process.env.AWS_REGION});
 var s3 = new aws.S3()
-let startDate = new Date()
 var upload = multer({
     storage: multerS3({
       s3: s3,
@@ -58,11 +54,9 @@ var upload = multer({
     }
     })
   })
-  let endDate = new Date();
-  var time = endDate.getMilliseconds() - startDate.getMilliseconds()
-  sdc.timing('upload-file-to-s3',time)
+ 
 router.post("/bill/:id/file",upload.single('file'),function (req, res) {
-
+       let startDate = new Date()
         LOGGER.info("Entering add file routes " + FILE_NAME);
         const responseObj = {}
         let decodedData = {};
@@ -103,6 +97,9 @@ router.post("/bill/:id/file",upload.single('file'),function (req, res) {
                 delete result.size
                 responseObj.result = result;
                 LOGGER.info("Add file route complete" + FILE_NAME)
+                let endDate = new Date();
+                var time = endDate.getMilliseconds() - startDate.getMilliseconds()
+                sdc.timing('upload-file-to-s3',time)
                 sdc.increment('POST file');
                 res.send(responseObj);
             }
