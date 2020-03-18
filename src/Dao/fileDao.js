@@ -12,10 +12,16 @@ const CONSTANTS = require("../constants/constants")
 var fs = require('fs');
 var aws = require('aws-sdk')
 var s3 = new aws.S3()
+const SDC = require('statsd-client'),
+sdc = new SDC({ host: 'localhost', port: 8125 });
 function addFile(fileData, callback) {
+    let startDate = new Date();
     LOGGER.debug("Entering add file DAO " + File_Name);
     fileModel.create(fileData).then(function (file) {
         LOGGER.info("new file attached " + File_Name)
+        let endDate = new Date();
+        let seconds = endDate.getMilliseconds() - startDate.getMilliseconds()
+        sdc.timing('DAO-operation-to-create-file', seconds);
         return callback(null, file.get({ plain: true }))
     }).catch(function (error) {
         let params = {

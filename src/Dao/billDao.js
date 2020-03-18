@@ -14,6 +14,8 @@ const CONSTANTS = require("../constants/constants")
 var aws = require('aws-sdk')
 var fs = require('fs');
 var s3 = new aws.S3()
+const SDC = require('statsd-client'),
+sdc = new SDC({ host: 'localhost', port: 8125 });
 /**
  *@function 
  * @name createBill
@@ -23,11 +25,16 @@ var s3 = new aws.S3()
  */
 function create(billData, callback) {
     LOGGER.debug("Entering create bill " + File_Name);
+    let billStartTime = new Date();
     billModel.create(billData).then(function (bill) {
         LOGGER.info("new Bill created " + File_Name)
         billModel.findOne({ where: {id : bill.dataValues.id}, include: fileModel }).then(function(result)
         {
             LOGGER.debug("Find one after result complete "+File_Name)
+            let billEndTime = new Date();
+            let billAIPtime = billEndTime.getMilliseconds() - billStartTime.getMilliseconds();
+            LOGGER.info('time need for create bill DAO ', billAIPtime);
+            sdc.timing('Create-bill-DAO-time',billAIPtime)
             return callback(null,result);
         }).catch(function(error)
         {

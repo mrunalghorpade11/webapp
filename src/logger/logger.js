@@ -7,7 +7,7 @@
  */
 const log4js = require('log4js');
 const path = require("path");
-
+var appRoot = require('app-root-path');
 log4js.configure({
     appenders: {
         out: {
@@ -15,7 +15,7 @@ log4js.configure({
         },
         app: {
             type: 'file',
-            filename: `${path.resolve('.')}/src/logs/app.log`,
+            filename: `${appRoot}/app.log`,
             maxLogSize: 10485760,
             backups: 1,
             compress: true
@@ -24,11 +24,12 @@ log4js.configure({
     categories: {
         default: {
             appenders: ['out', 'app'],
-            level: 'debug'
+            level: 'INFO'
         }
     }
 });
 
 const logger = log4js.getLogger();
-logger.debug('Logger Level On : ', 'debug');
+logger.debug('Logger Level On : ', 'info');
+logger.info('check');
 module.exports = logger;

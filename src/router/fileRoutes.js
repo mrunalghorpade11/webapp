@@ -19,8 +19,8 @@ const FILE_NAME = "fileRoute.js";
 var path = require('path')
 var fs = require('fs');
 var multerS3 = require('multer-s3')
-
-
+const SDC = require('statsd-client'), 
+sdc = new SDC({host: 'localhost', port: 8125});
 /**
  * Endpoint to add fille to a bill
  * @memberof fillRoutes.js
@@ -54,17 +54,16 @@ var upload = multer({
     }
     })
   })
+ 
 router.post("/bill/:id/file",upload.single('file'),function (req, res) {
-
+       let startDate = new Date()
         LOGGER.info("Entering add file routes " + FILE_NAME);
         const responseObj = {}
         let decodedData = {};
-
         if (req.file == null) {
             res.statusCode = CONSTANTS.ERROR_CODE.BAD_REQUEST
             return res.send({"Error":"No file attached"});
         }
-        console.log("file",req.file);
         const pathformd5 = req.file.location
       //  const hash = md5.sync(pathformd5);
       const hash = "abcd";
@@ -97,6 +96,11 @@ router.post("/bill/:id/file",upload.single('file'),function (req, res) {
                 delete result.MD5hash
                 delete result.size
                 responseObj.result = result;
+                LOGGER.info("Add file route complete" + FILE_NAME)
+                let endDate = new Date();
+                var time = endDate.getMilliseconds() - startDate.getMilliseconds()
+                sdc.timing('upload-file-to-s3',time)
+                sdc.increment('POST file');
                 res.send(responseObj);
             }
         })
@@ -130,6 +134,8 @@ router.get("/bill/:bill_id/file/:file_id", function (req, res) {
             delete result.MD5hash
             delete result.size
             responseObj.result = result;
+            LOGGER.info("get file by id complete" + FILE_NAME)
+            sdc.increment('GET file');
             res.send(responseObj);
         }
     })
@@ -159,9 +165,11 @@ router.delete("/bill/:bill_id/file/:file_id", function (req, res) {
             res.send(responseObj);
         }
         else {
+            LOGGER.info("delete file routes complete "+FILE_NAME);
             res.statusCode = CONSTANTS.ERROR_CODE.SUCCESS
             res.statusMessage = "OK"
             responseObj.result = result;
+            sdc.increment('DELETE file');
             res.send(responseObj);
         }
     })

@@ -17,6 +17,8 @@ const base64 = require('base-64');
 const { check, validationResult } = require('express-validator');
 const uuidv4 = require('uuid/v4');
 var passwordValidator = require('password-validator');
+const SDC = require('statsd-client'), 
+sdc = new SDC({host: 'localhost', port: 8125});
 /**
  * Endpoint to send user info to DB
  * @memberof basicnRoute.js
@@ -32,6 +34,7 @@ router.post("/user", [
   check('password').exists()
 ], async function (req, res) {
   LOGGER.info("Entering Get user Route" + FILE_NAME);
+  let createUserStartTime = new Date();
   let responseObj = {};
   const errors = validationResult(req)
   if (!errors.isEmpty()) {
@@ -59,11 +62,16 @@ router.post("/user", [
       res.send(responseObj);
     }
     else {
-      LOGGER.debug("create success " + FILE_NAME);
+      LOGGER.info("create success " + FILE_NAME);
       res.statusCode = CONSTANTS.ERROR_CODE.CREATED;
       res.statusMessage = "User Created"
       delete result.password;
       responseObj.result = result;
+      let createUserEndTime = new Date();
+      let createUserTime = createUserStartTime.getMilliseconds() - createUserEndTime.getMilliseconds()
+      LOGGER.info("Create user time ",createUserTime);
+      sdc.timing('create-user-time',createUserTime)
+      sdc.increment('POST user');
       res.send(responseObj);
     }
   })
@@ -77,6 +85,7 @@ router.post("/user", [
  * @returns {object} responseObject
  */
 router.get("/user/self", function (req, res) {
+  sdc.increment('GET User');
   LOGGER.info("Entering get user info routes " + FILE_NAME);
   //create responce object
   const responseObj = {}
@@ -100,7 +109,7 @@ router.get("/user/self", function (req, res) {
       res.send(responseObj);
     }
     else {
-
+      LOGGER.info("GET user complete" + FILE_NAME)
       res.statusCode = CONSTANTS.ERROR_CODE.SUCCESS
       res.statusMessage = "OK"
       responseObj.result = result;
@@ -118,6 +127,7 @@ router.get("/user/self", function (req, res) {
  * @returns {object} responseObject
  */
 router.put("/user/self", function (req, res) {
+  sdc.increment('PUT User');
   LOGGER.info("Entering PUT user info routes " + FILE_NAME);
   let responseObj = {}
   let decodedData = {};
@@ -158,7 +168,7 @@ router.put("/user/self", function (req, res) {
       res.send(responseObj);
     }
     else {
-      LOGGER.info("Update route complete ", FILE_NAME)
+      LOGGER.info("Update user route complete ", FILE_NAME)
       res.statusCode = CONSTANTS.ERROR_CODE.NO_CONTENT
       res.statusMessage = "OK"
       delete result.password;

@@ -9,6 +9,8 @@ const userModel = require("../models/user").User;
 const LOGGER = require("../logger/logger");
 const File_Name = "userDao.js"
 const bcrypt = require('bcrypt');
+const SDC = require('statsd-client'),
+    sdc = new SDC({ host: 'localhost', port: 8125 });
 /**
  *@function 
  * @name createUser
@@ -18,9 +20,6 @@ const bcrypt = require('bcrypt');
  */
 function createUsers(userData, callback) {
     userModel.findOrCreate({ where: { email_address: userData.email_address }, defaults: userData }).spread(function (user, created) {
-        // console.log(user.get({
-        //     plain: true
-        // }))
         if (created) {
             LOGGER.debug("New user created in createUsers " + File_Name);
             return callback(null, user.get({ plain: true }));
@@ -48,9 +47,9 @@ async function getUser(dataObj, callback) {
     const dataSplit = dataObj.data.split(':')
     const userID = dataSplit[0];
     const password = dataSplit[1]
+    let startDategetUser = new Date();
     await userModel.findOne({ where: { email_address: userID }, attributes: ['password'] }).then(
         async function (pass) {
-
             await bcrypt.compare(password, pass.password).then(async function (res) {
                 if (res == true) {
                     let result = await userModel.findOne({ where: { email_address: userID, password: pass.password }, attributes: ['first_name', 'last_name', 'email_address', 'account_created', 'account_updated'] })
@@ -58,6 +57,9 @@ async function getUser(dataObj, callback) {
                     result.dataValues.account_updated = result.dataValues.updatedAt;
                     delete result.dataValues.createdAt;
                     delete result.dataValues.updatedAt;
+                    let endDategetUser = new Date();
+                    let seconds = endDategetUser.getMilliseconds() - startDategetUser.getMilliseconds()
+                    sdc.timing('DAO-get-User', seconds);
                     return callback(null, result);
                 }
                 else {
@@ -86,6 +88,7 @@ async function editUser(data, payload, callback) {
     const userID = dataSplit[0];
     const password = dataSplit[1];
     //Find password in DB
+    let startDate = new Date();
     await userModel.findOne({ where: { email_address: userID }, attributes: ['password'] }).then(async function (pass) {
         //compare the password againt header password
         await bcrypt.compare(password, pass.password).then(function (res) {
@@ -96,6 +99,9 @@ async function editUser(data, payload, callback) {
                     .then(function (user) {
                         userModel.findOne({ where: { email_address: userID } }).then(function (user) {
                             LOGGER.debug("user found after update: ", File_Name)
+                            let endDate = new Date();
+                            let seconds = (endDate.getTime() - startDate.getTime()) / 1000;
+                            sdc.timing('DAO-edit-user-time', seconds);
                             return callback(null, "user updated")
                         }).catch(function (error) {
                             LOGGER.error("user not found after update ", File_Name)
