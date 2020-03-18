@@ -10,7 +10,7 @@ const LOGGER = require("../logger/logger");
 const File_Name = "userDao.js"
 const bcrypt = require('bcrypt');
 const SDC = require('statsd-client'),
-    sdc = new SDC({ host: 'localhost', port: 8125 });
+sdc = new SDC({ host: 'localhost', port: 8125 });
 /**
  *@function 
  * @name createUser

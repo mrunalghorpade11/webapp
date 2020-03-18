@@ -82,7 +82,6 @@ router.post("/bill", [
  * @returns {object} responseObject
  */
 router.get("/bills", function (req, res) {
-    sdc.increment('GET Bill');
     const responseObj = {}
     let decodedData = {};
     const bearerHeader = req.headers.authorization;
@@ -116,13 +115,14 @@ router.get("/bills", function (req, res) {
                     }
                 }
             responseObj.result = result;
+            sdc.increment('GET Bill');
             res.send(responseObj);
         }
     })
 })
 
 router.get("/bill/:id", function (req, res) {
-    sdc.increment('GET Bill by ID');
+    
     //create responce object
     const responseObj = {}
     let decodedData = {};
@@ -167,6 +167,7 @@ router.get("/bill/:id", function (req, res) {
             delete result.attachment.dataValues.size
             }
             responseObj.result = result;
+            sdc.increment('GET Bill by ID');
             res.send(responseObj);
         }
     })
