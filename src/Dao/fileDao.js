@@ -20,7 +20,7 @@ function addFile(fileData, callback) {
     fileModel.create(fileData).then(function (file) {
         LOGGER.info("new file attached " + File_Name)
         let endDate = new Date();
-        let seconds = (endDate.getTime() - startDate.getTime()) / 1000;
+        let seconds = endDate.getMilliseconds() - startDate.getMilliseconds()
         sdc.timing('DAO-operation-to-create-file', seconds);
         return callback(null, file.get({ plain: true }))
     }).catch(function (error) {

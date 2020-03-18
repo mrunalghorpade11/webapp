@@ -62,6 +62,7 @@ router.post("/bill", [
             res.statusCode = CONSTANTS.ERROR_CODE.BAD_REQUEST
             res.statusMessage = "Bad Request"
             responseObj.error = error
+            LOGGER.info("POST bill route complete "+FILE_NAME);
             res.send(responseObj);
         }
         else {
@@ -116,14 +117,13 @@ router.get("/bills", function (req, res) {
                 }
             responseObj.result = result;
             sdc.increment('GET Bill');
+            LOGGER.info("get all bills route complete "+FILE_NAME)
             res.send(responseObj);
         }
     })
 })
 
 router.get("/bill/:id", function (req, res) {
-    
-    //create responce object
     const responseObj = {}
     let decodedData = {};
     const bearerHeader = req.headers.authorization;
@@ -160,6 +160,7 @@ router.get("/bill/:id", function (req, res) {
             }
         }
         else {
+            LOGGER.info("get bill by ID route compete "+FILE_NAME)
             res.statusCode = CONSTANTS.ERROR_CODE.SUCCESS
             res.statusMessage = "OK"
             if(result.attachment){
@@ -210,9 +211,11 @@ router.delete("/bill/:id", function (req, res) {
             }
         }
         else {
+            LOGGER.info("Delete bill by id route complete "+FILE_NAME)
             res.statusCode = CONSTANTS.ERROR_CODE.NO_CONTENT
             res.statusMessage = "OK"
             // responseObj.result = result;
+            sdc.increment('DELETE bill');
             res.send();
         }
     })
@@ -271,9 +274,11 @@ router.put("/bill/:id",[
             }
         }
         else {
+            LOGGER.info("update route for bill complete "+FILE_NAME)
             res.statusCode = CONSTANTS.ERROR_CODE.SUCCESS
             res.statusMessage = "OK"
             responseObj.result = result;
+            sdc.increment('edit-bill-by-ID');
             res.send(responseObj);
         }
     })

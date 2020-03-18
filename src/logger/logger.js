@@ -30,6 +30,6 @@ log4js.configure({
 });
 
 const logger = log4js.getLogger();
-logger.debug('Logger Level On : ', 'debug');
+logger.debug('Logger Level On : ', 'info');
 logger.info('check');
 module.exports = logger;

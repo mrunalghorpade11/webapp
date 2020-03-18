@@ -59,7 +59,7 @@ var upload = multer({
     })
   })
   let endDate = new Date();
-  var time = (endDate.getTime() - startDate.getTime())/1000;
+  var time = endDate.getMilliseconds() - startDate.getMilliseconds()
   sdc.timing('upload-file-to-s3',time)
 router.post("/bill/:id/file",upload.single('file'),function (req, res) {
 
@@ -103,6 +103,7 @@ router.post("/bill/:id/file",upload.single('file'),function (req, res) {
                 delete result.size
                 responseObj.result = result;
                 LOGGER.info("Add file route complete" + FILE_NAME)
+                sdc.increment('POST file');
                 res.send(responseObj);
             }
         })
@@ -137,6 +138,7 @@ router.get("/bill/:bill_id/file/:file_id", function (req, res) {
             delete result.size
             responseObj.result = result;
             LOGGER.info("get file by id complete" + FILE_NAME)
+            sdc.increment('GET file');
             res.send(responseObj);
         }
     })
@@ -166,9 +168,11 @@ router.delete("/bill/:bill_id/file/:file_id", function (req, res) {
             res.send(responseObj);
         }
         else {
+            LOGGER.info("delete file routes complete "+FILE_NAME);
             res.statusCode = CONSTANTS.ERROR_CODE.SUCCESS
             res.statusMessage = "OK"
             responseObj.result = result;
+            sdc.increment('DELETE file');
             res.send(responseObj);
         }
     })

@@ -163,7 +163,7 @@ router.put("/user/self", function (req, res) {
       res.send(responseObj);
     }
     else {
-      LOGGER.info("Update route complete ", FILE_NAME)
+      LOGGER.info("Update user route complete ", FILE_NAME)
       res.statusCode = CONSTANTS.ERROR_CODE.NO_CONTENT
       res.statusMessage = "OK"
       delete result.password;
