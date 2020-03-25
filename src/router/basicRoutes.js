@@ -182,7 +182,7 @@ router.put("/user/self", function (req, res) {
    * @name HealthCheck
    * @description This Route is used for health check 
    */
-  router.get("/", function (req, res) {
+  router.get("/check", function (req, res) {
     res.statusCode = 200;
     res.statusMessage = "OK"
     res.send();
