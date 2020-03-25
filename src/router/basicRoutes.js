@@ -17,8 +17,8 @@ const base64 = require('base-64');
 const { check, validationResult } = require('express-validator');
 const uuidv4 = require('uuid/v4');
 var passwordValidator = require('password-validator');
-const SDC = require('statsd-client'), 
-sdc = new SDC({host: 'localhost', port: 8125});
+const SDC = require('statsd-client'),
+  sdc = new SDC({ host: 'localhost', port: 8125 });
 /**
  * Endpoint to send user info to DB
  * @memberof basicnRoute.js
@@ -41,9 +41,8 @@ router.post("/user", [
     return res.status(400).json({ errors: errors.array() })
   }
   var schema = new passwordValidator();
-  schema.is().min(8).has().uppercase().has().lowercase().has().digits() 
-  if(!schema.validate(req.body.password))
-  {
+  schema.is().min(8).has().uppercase().has().lowercase().has().digits()
+  if (!schema.validate(req.body.password)) {
     return res.status(400).json("password must be 8 character, one lowercase letter, one uppercase letter, on digit")
   }
   var hashedPassword = bcrypt.hashSync(req.body.password, 8);
@@ -69,8 +68,8 @@ router.post("/user", [
       responseObj.result = result;
       let createUserEndTime = new Date();
       let createUserTime = createUserStartTime.getMilliseconds() - createUserEndTime.getMilliseconds()
-      LOGGER.info("Create user time ",createUserTime);
-      sdc.timing('create-user-time',createUserTime)
+      LOGGER.info("Create user time ", createUserTime);
+      sdc.timing('create-user-time', createUserTime)
       sdc.increment('POST user');
       res.send(responseObj);
     }
@@ -142,13 +141,11 @@ router.put("/user/self", function (req, res) {
     responseObj.result = "unauthorised token";
     res.send(responseObj);
   }
-  function checkPayload(req)
-  {
-    if(!req.body.first_name || !req.body.last_name || !req.body.password || !req.body.email_address)
-    {
-    res.statusCode = CONSTANTS.ERROR_CODE.BAD_REQUEST
-    return res.status(400).json('Incomplete payload')
-  }
+  function checkPayload(req) {
+    if (!req.body.first_name || !req.body.last_name || !req.body.password || !req.body.email_address) {
+      res.statusCode = CONSTANTS.ERROR_CODE.BAD_REQUEST
+      return res.status(400).json('Incomplete payload')
+    }
   }
   checkPayload(req);
   /**
@@ -176,16 +173,16 @@ router.put("/user/self", function (req, res) {
       res.send(responseObj);
     }
   })
-  /**
-   *@function 
-   * @name HealthCheck
-   * @description This Route is used for health check 
-   */
-  router.get("/check", function (req, res) {
-    LOGGER.info("In health check "+FILE_NAME)
-    res.statusCode = 200;
-    res.statusMessage = "OK"
-    res.send();
-  })
+})
+/**
+ *@function 
+ * @name HealthCheck
+ * @description This Route is used for health check 
+ */
+router.get("/check", function (req, res) {
+  LOGGER.info("In health check " + FILE_NAME)
+  res.statusCode = 200;
+  res.statusMessage = "OK"
+  res.send();
 })
 module.exports = router;
