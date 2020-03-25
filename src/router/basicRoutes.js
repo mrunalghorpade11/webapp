@@ -177,5 +177,15 @@ router.put("/user/self", function (req, res) {
     }
   })
 
+  /**
+   *@function 
+   * @name HealthCheck
+   * @description This Route is used for health check 
+   */
+  router.get("/check", function (req, res) {
+    res.statusCode = 200;
+    res.statusMessage = "OK"
+    res.send();
+  })
 })
 module.exports = router;
