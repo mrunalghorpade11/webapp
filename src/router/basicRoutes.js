@@ -176,13 +176,13 @@ router.put("/user/self", function (req, res) {
       res.send(responseObj);
     }
   })
-
   /**
    *@function 
    * @name HealthCheck
    * @description This Route is used for health check 
    */
   router.get("/check", function (req, res) {
+    LOGGER.info("In health check "+FILE_NAME)
     res.statusCode = 200;
     res.statusMessage = "OK"
     res.send();
