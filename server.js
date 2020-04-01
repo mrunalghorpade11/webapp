@@ -20,6 +20,10 @@ const port = 8080;
 const userModel = require(path.resolve(".") + "/src/models/user").User;
 const billsModel = require(path.resolve(".") + "/src/models/billModel").Bill;
 const fileModel = require(path.resolve(".")+ "/src/models/fileModel").Files;
+const { Consumer } = require('sqs-consumer');
+const AWS = require('aws-sdk');
+AWS.config.update({region: 'us-east-1'});
+
 require('dotenv').config();
 
 userModel.hasMany(billsModel,{as: 'bills', foreignKey: 'owner_id'})
@@ -33,7 +37,22 @@ app.use("/v1", basicrouter);
 app.use("/v1", billRoutes);
 app.use("/v1",fileRoutes);
 
-var server = app.listen(port, function () {
+const sqsconsumer = Consumer.create({
+  queueUrl: process.env.SQSurl,
+  handleMessage: async (message) => {
+ LOGGER.info("This is the message from SQS "+message)
+  }
+});
+sqsconsumer.on('error', (err) => {
+  LOGGER.error("Error in sqs "+err.message);
+});
+sqsconsumer.on('processing_error', (err) => {
+  console.error("processing error "+err.message);
+});
+sqsconsumer.start();
+Logger.info("is Polling ON? "+sqsconsumer.isRunning())
+
+app.listen(port, function () {
   LOGGER.debug("Express server listening on port %s.", port);
 });
 module.exports = app;

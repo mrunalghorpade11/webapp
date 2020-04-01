@@ -24,7 +24,7 @@ log4js.configure({
     categories: {
         default: {
             appenders: ['out', 'app'],
-            level: 'debug'
+            level: 'info'
         }
     }
 });

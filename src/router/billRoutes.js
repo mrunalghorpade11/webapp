@@ -332,7 +332,7 @@ router.get("/bills/due/:days", function (req, res) {
                 MessageBody:  JSON.stringify(result),
                 // MessageDeduplicationId: "TheWhistler",  // Required for FIFO queues
                 // MessageId: "Group1",  // Required for FIFO queues
-                QueueUrl: "https://sqs.us-east-1.amazonaws.com/681276034545/webappQueue"
+                QueueUrl: process.env.SQSurl
               };
               sqs.sendMessage(queueParams, function(err, data) {
                 if (err) {
