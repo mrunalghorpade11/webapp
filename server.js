@@ -50,7 +50,7 @@ sqsconsumer.on('processing_error', (err) => {
   console.error("processing error "+err.message);
 });
 sqsconsumer.start();
-Logger.info("is Polling ON? "+sqsconsumer.isRunning())
+LOGGER.info("is Polling ON? "+sqsconsumer.isRunning)
 
 app.listen(port, function () {
   LOGGER.debug("Express server listening on port %s.", port);
