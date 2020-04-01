@@ -41,6 +41,19 @@ const sqsconsumer = Consumer.create({
   queueUrl: process.env.SQSurl,
   handleMessage: async (message) => {
  LOGGER.info("This is the message from SQS "+message)
+ var params = {
+  Message: message, /* required */
+  TopicArn: process.env.TopicArn
+}
+var publishTextPromise = new AWS.SNS({apiVersion: '2010-03-31'}).publish(params).promise();
+publishTextPromise.then(
+  function(data) {
+   LOGGER.info(`Message ${params.Message} send sent to the topic ${params.TopicArn}`);
+    LOGGER.info("MessageID is " + data.MessageId);
+  }).catch(
+    function(err) {
+    LOGGER.error("Error publishing to SNS"+err, err.stack);
+  });
   }
 });
 sqsconsumer.on('error', (err) => {
