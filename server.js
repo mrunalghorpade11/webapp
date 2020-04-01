@@ -40,9 +40,9 @@ app.use("/v1",fileRoutes);
 const sqsconsumer = Consumer.create({
   queueUrl: process.env.SQSurl,
   handleMessage: async (message) => {
- LOGGER.info("This is the message from SQS "+message)
+ LOGGER.info("This is the message from SQS "+JSON.stringify(message))
  var params = {
-  Message: message, /* required */
+  Message: JSON.stringify(message), /* required */
   TopicArn: process.env.TopicArn
 }
 var publishTextPromise = new AWS.SNS({apiVersion: '2010-03-31'}).publish(params).promise();
