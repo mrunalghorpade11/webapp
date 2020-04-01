@@ -44,7 +44,48 @@ jobs:
 
       # run tests!
       - run: yarn test
-      
+      - run: 
+          name: Install unzip
+          command: |
+            sudo apt install zip
+            sudo apt install unzip
+      - run: 
+          name: Install AWSCLI
+          command : |
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
+      - run:
+          name: Build artifacts
+          command: |
+            pwd
+            mkdir build_artifacts
+            cd build_artifacts
+            ls
+            cp ../*.json .
+            cp ../*.js .
+            cp ../*.md .
+            cp -r ../src .
+            cp -r ../test .
+            cp -r ../.circleci .
+            cp -r ../.git .
+            cp -r ../scripts .
+            cp ../*.yml .
+            touch .env
+            pwd
+            zip -r csye6225-webapp . 
+            ls -a
+            aws s3 cp csye6225-webapp.zip s3://${bucket_name}
+            echo 'upload to s3 done'
+      - run: 
+          name: Install less
+          command: |
+            sudo apt-get install less -y
+      - run:
+          name: Call code deploy
+          command: |
+            aws configure set region ${AWS_REGION}
+            aws deploy create-deployment --application-name csye6225-webapp --deployment-config-name CodeDeployDefault.AllAtOnce --deployment-group-name csye6225-webapp-deployment --s3-location bucket=${bucket_name},bundleType=zip,key=csye6225-webapp.zip      
   build:
     docker:
       # specify the version you desire here

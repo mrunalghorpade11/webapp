@@ -36,7 +36,7 @@ function createBill(decodeData, billData, callback) {
                     return callback(error, null);
                 }
                 else {
-                    LOGGER.info("create new bull success " + File_Name)
+                    LOGGER.info("create new bill success " + File_Name)
                     return callback(null, result)
                 }
             })
@@ -214,10 +214,32 @@ function updatebyid(decodeData, ID, payload, callback) {
         }
     })
 }
+/**
+*@function 
+* @name getBillDue
+* @description Function used get bills due by a date
+* @param {Object} decodeData data received from request body
+* @param {Integer} param number of days to retrive
+* @param {Object} callback
+*/
+function getBillDue(decodeData, param, callback) {
+    LOGGER.debug("in due bill service "+File_Name);
+    billDao.due(decodeData.data, param, function (error, result) {
+        if (error) {
+            LOGGER.error("error in get all bills due service " + File_Name)
+            return callback(error, null)
+        }
+        else {
+            LOGGER.info("get all bills due service complete " + File_Name)
+            return callback(null, result)
+        }
+    })
+}
 module.exports = {
     createBill,
     getAllBills,
     getbillbyID,
     deletebillbyID,
-    updatebyid
+    updatebyid,
+    getBillDue
 }

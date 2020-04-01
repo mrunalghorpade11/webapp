@@ -16,6 +16,9 @@ const { check, validationResult } = require('express-validator');
 const billService = require("../service/billService")
 const SDC = require('statsd-client'), 
 sdc = new SDC({host: 'localhost', port: 8125});
+var AWS = require('aws-sdk');
+AWS.config.update({region: 'us-east-1'});
+var sqs = new AWS.SQS({apiVersion: '2012-11-05'});
 /**
  * Endpoint to send Bill info to DB
  * @memberof billRoutes.js
@@ -282,6 +285,77 @@ router.put("/bill/:id",[
             res.send(responseObj);
         }
     })
+})
+
+router.get("/bills/due/:days", function (req, res) {
+    let decodedData = {};
+    const responseObj = {}
+    if(req.params.days < 0)
+    {
+        LOGGER.error("Invalid parameter "+FILE_NAME)
+        responseObj.result = "Invalid parameter"
+        return  res.send(responseObj);
+    }
+    const bearerHeader = req.headers.authorization;
+    if (typeof bearerHeader != "undefined") {
+        const bearer = bearerHeader.split(' ')
+        const bearerToken = bearer[1]
+        decodedData.data = base64.decode(bearerToken);
+    }
+    else {
+        res.statusCode = CONSTANTS.ERROR_CODE.UNAUTHORIZED
+        responseObj.result = "unauthorised token";
+        return  res.send(responseObj);
+    }
+    LOGGER.debug("param value ",req.params.days);
+    billService.getBillDue(decodedData,req.params.days,function(error,result)
+    {
+        if(error)
+        {
+            res.statusCode = CONSTANTS.ERROR_CODE.BAD_REQUEST
+            res.statusMessage = "failed to get data"
+            responseObj.error = error
+            res.send(responseObj);
+        }
+        else
+        {
+            res.statusCode = CONSTANTS.ERROR_CODE.SUCCESS
+            res.statusMessage = "OK"
+            var queueParams = {
+                DelaySeconds: 10,
+                MessageAttributes: {
+                  "QueueName": {
+                    DataType: "String",
+                    StringValue: "webappQueue"
+                  }
+                },
+                MessageBody:  JSON.stringify(result),
+                // MessageDeduplicationId: "TheWhistler",  // Required for FIFO queues
+                // MessageId: "Group1",  // Required for FIFO queues
+                QueueUrl: "https://sqs.us-east-1.amazonaws.com/681276034545/webappQueue"
+              };
+              sqs.sendMessage(queueParams, function(err, data) {
+                if (err) {
+                  console.log("Error", err);
+                } else {
+                    LOGGER.info("message uploaded on queue" +FILE_NAME)
+                  console.log("Success", data.MessageId);
+                }
+              });
+            for (var i in result)
+                {
+                    if(result[i].attachment){
+                    delete result[i].attachment.dataValues.MD5hash
+                    delete result[i].attachment.dataValues.size
+                    }
+                }
+            responseObj.result = result;
+            LOGGER.info("get all bills due route complete "+FILE_NAME)
+            res.send(responseObj);
+        }
+    })
+
+
 })
 //Date should always be YYYY-MM-DD
 function isValidDate(value) {

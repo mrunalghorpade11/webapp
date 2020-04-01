@@ -24,11 +24,10 @@ log4js.configure({
     categories: {
         default: {
             appenders: ['out', 'app'],
-            level: 'INFO'
+            level: 'debug'
         }
     }
 });
-
 const logger = log4js.getLogger();
 logger.debug('Logger Level On : ', 'info');
 logger.info('check');
