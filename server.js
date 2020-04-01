@@ -40,7 +40,7 @@ app.use("/v1",fileRoutes);
 const sqsconsumer = Consumer.create({
   queueUrl: process.env.SQSurl,
   handleMessage: async (message) => {
- LOGGER.info("This is the message from SQS "+JSON.stringify(message))
+ LOGGER.info("This is the message from SQS "+JSON.stringify(message.Body))
  var params = {
   Message: JSON.stringify(message), /* required */
   TopicArn: process.env.TopicArn
