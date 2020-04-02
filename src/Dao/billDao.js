@@ -180,7 +180,8 @@ function due(data,param, callback) {
                 where: {
                     due_date: {
                         [Op.between]: [fromDate, toDate]
-                    }
+                    },
+                    owner_id: result.dataValues.id
                 }, include: fileModel
             }).then(function (bills) {
                 LOGGER.debug("due bills found " + File_Name)

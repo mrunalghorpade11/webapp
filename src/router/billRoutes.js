@@ -319,6 +319,8 @@ router.get("/bills/due/:days", function (req, res) {
         }
         else
         {
+            const user_email= decodedData.data.split(':')
+            result[0].user_email = user_email[0];
             res.statusCode = CONSTANTS.ERROR_CODE.SUCCESS
             res.statusMessage = "OK"
             var queueParams = {
