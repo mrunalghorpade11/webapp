@@ -320,7 +320,7 @@ router.get("/bills/due/:days", function (req, res) {
         else
         {
             const user_email= decodedData.data.split(':')
-            result[0].user_email = user_email[0];
+            result[0].dataValues.user_email = user_email[0];
             res.statusCode = CONSTANTS.ERROR_CODE.SUCCESS
             res.statusMessage = "OK"
             var queueParams = {
@@ -350,6 +350,7 @@ router.get("/bills/due/:days", function (req, res) {
                     delete result[i].attachment.dataValues.MD5hash
                     delete result[i].attachment.dataValues.size
                     }
+                    result[i].dataValues.user_email = user_email[0];
                 }
             responseObj.result = result;
             LOGGER.info("get all bills due route complete "+FILE_NAME)
