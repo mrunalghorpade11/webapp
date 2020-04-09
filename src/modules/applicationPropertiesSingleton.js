@@ -17,7 +17,7 @@ var sequelize = new Sequelize(process.env.DBNAME,process.env.DB_USERNAME,process
         host: process.env.DB_HOST,
         dialect: 'mariadb',
         dialectOptions: {
-          ssl:'Amazon RDS'
+          ssl:true
         }
     }
 );
