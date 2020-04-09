@@ -11,8 +11,6 @@ const port = {
 const contextPath = {
     contextPath: "/assignment"
 }
-const fs = require('fs');
-const rdsCa = fs.readFileSync('./rds-combined-ca-bundle.pem');
 var Sequelize = require('sequelize');
 var sequelize = new Sequelize(process.env.DBNAME,process.env.DB_USERNAME,process.env.DB_PASSWORD,
     {
