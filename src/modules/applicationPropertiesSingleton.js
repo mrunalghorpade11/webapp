@@ -12,7 +12,8 @@ const contextPath = {
     contextPath: "/assignment"
 }
 const fs = require('fs');
-const rdsCa = fs.readFileSync('rds-ca-2019-root.pem');
+const path = process.env.Home_dir
+const rdsCa = fs.readFileSync(path+'rds-ca-2019-root.pem');
 var Sequelize = require('sequelize');
 var sequelize = new Sequelize(process.env.DBNAME,process.env.DB_USERNAME,process.env.DB_PASSWORD,
     {
