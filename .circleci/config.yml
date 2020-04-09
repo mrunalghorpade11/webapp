@@ -41,6 +41,10 @@ jobs:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
+      - run: 
+          name: install CA_CERTIFICATE
+          command: |
+            curl -o /home/circleci/rds-ca-2019-root.pem https://s3.amazonaws.com/rds-downloads/rds-combined-ca-bundle.pem
 
       # run tests!
       - run: yarn test
@@ -111,7 +115,6 @@ jobs:
             cp -r ../scripts .
             cp ../*.yml .
             touch .env
-            curl "https://s3.amazonaws.com/rds-downloads/rds-ca-2019-root.pem"
             pwd
             zip -r csye6225-webapp . 
             ls -a
