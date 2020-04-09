@@ -19,10 +19,7 @@ var sequelize = new Sequelize(process.env.DBNAME,process.env.DB_USERNAME,process
         host: process.env.DB_HOST,
         dialect: 'mariadb',
         dialectOptions: {
-            ssl: {
-                rejectUnauthorized: true,
-                ca: [rdsCa]
-            }
+          ssl:true
         }
     }
 );
