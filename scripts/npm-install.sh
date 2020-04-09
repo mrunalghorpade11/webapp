@@ -1,6 +1,7 @@
 #!/bin/bash
 cd /home/ubuntu
 cd ..
+sudo cp rds-ca-2019-root.pem /home/ubuntu
 cd ..
 sudo cp environment /home/ubuntu
 cd /home/ubuntu

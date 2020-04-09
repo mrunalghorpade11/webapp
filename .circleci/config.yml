@@ -114,7 +114,6 @@ jobs:
             cp -r ../scripts .
             cp ../*.yml .
             touch .env
-            curl "https://s3.amazonaws.com/rds-downloads/rds-ca-2019-root.pem"
             pwd
             zip -r csye6225-webapp . 
             ls -a
