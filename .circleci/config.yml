@@ -73,7 +73,8 @@ jobs:
             - v1-dependencies-
 
       - run: yarn install
-      - run: install CA_CERTIFICATE
+      - run: 
+          name: install CA_CERTIFICATE
           command: |
             curl https://s3.amazonaws.com/rds-downloads/rds-combined-ca-bundle.pem
       #- run: node server.js
